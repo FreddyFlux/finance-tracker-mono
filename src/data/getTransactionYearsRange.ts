@@ -10,16 +10,18 @@ export const getTransactionYearsRange = createServerFn({
   .middleware([authMiddleware])
   .handler(async ({ context }) => {
     const today = new Date();
-    const [earliestTransaction] = await db
-      .select()
+    const transactions = await db
+      .select({
+        transactionDate: transactionsTable.transactionDate,
+      })
       .from(transactionsTable)
       .where(eq(transactionsTable.userId, context.userId))
       .orderBy(asc(transactionsTable.transactionDate))
       .limit(1);
 
     const currentYear = today.getFullYear();
-    const earliestYear = earliestTransaction
-      ? new Date(earliestTransaction.transactionDate).getFullYear()
+    const earliestYear = transactions[0]
+      ? new Date(transactions[0].transactionDate).getFullYear()
       : currentYear;
 
     const yearsRange = Array.from({

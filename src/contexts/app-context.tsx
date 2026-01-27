@@ -30,9 +30,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const refetchYearsRange = async () => {
     try {
       const data = await getTransactionYearsRange();
-      setYearsRange(data);
+      // Ensure we always have at least the current year
+      const currentYear = new Date().getFullYear();
+      setYearsRange(data.length > 0 ? data : [currentYear]);
     } catch (error) {
       console.error("Failed to fetch years range:", error);
+      // Default to current year on error
+      const currentYear = new Date().getFullYear();
+      setYearsRange([currentYear]);
     }
   };
 
@@ -45,9 +50,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
           getTransactionYearsRange(),
         ]);
         setCategories(cats);
-        setYearsRange(years);
+        // Ensure we always have at least the current year
+        const currentYear = new Date().getFullYear();
+        setYearsRange(years.length > 0 ? years : [currentYear]);
       } catch (error) {
         console.error("Failed to fetch app data:", error);
+        // Default to current year on error
+        const currentYear = new Date().getFullYear();
+        setYearsRange([currentYear]);
       } finally {
         setIsLoading(false);
       }

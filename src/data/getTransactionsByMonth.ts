@@ -7,6 +7,7 @@ import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
 import { TRANSACTION_LIMITS } from "@/lib/constants";
 import { getCurrentYear } from "@/lib/validation";
+import { generateRecurringTransactionsForMonth } from "./generateRecurringTransactions";
 
 const schema = z.object({
   month: z.number().min(1).max(12),
@@ -22,6 +23,13 @@ export const getTransactionsByMonth = createServerFn({
   .middleware([authMiddleware])
   .inputValidator((data: z.infer<typeof schema>) => schema.parse(data))
   .handler(async ({ context, data }) => {
+    // Generate recurring transactions for the requested month/year
+    await generateRecurringTransactionsForMonth({
+      userId: context.userId,
+      month: data.month,
+      year: data.year,
+    });
+
     const earliestDate = new Date(data.year, data.month - 1, 1);
     const latestDate = new Date(data.year, data.month, 0);
 
@@ -33,8 +41,13 @@ export const getTransactionsByMonth = createServerFn({
         transactionDate: transactionsTable.transactionDate,
         category: categoriesTable.name,
         transactionType: categoriesTable.type,
+        recurringTransactionId: transactionsTable.recurringTransactionId,
       })
       .from(transactionsTable)
+      .leftJoin(
+        categoriesTable,
+        eq(transactionsTable.categoryId, categoriesTable.id)
+      )
       .where(
         and(
           eq(transactionsTable.userId, context.userId),
@@ -48,10 +61,6 @@ export const getTransactionsByMonth = createServerFn({
           )
         )
       )
-      .orderBy(desc(transactionsTable.transactionDate))
-      .leftJoin(
-        categoriesTable,
-        eq(transactionsTable.categoryId, categoriesTable.id)
-      );
+      .orderBy(desc(transactionsTable.transactionDate));
     return transactions;
   });

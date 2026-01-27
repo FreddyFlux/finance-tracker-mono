@@ -56,6 +56,20 @@ export const categoryIdSchema = z.coerce
 
 export const transactionIdSchema = z.number();
 
+export const repeatFrequencySchema = z.enum(["monthly", "yearly"]);
+
+export const recurringTransactionIdSchema = z.number().positive();
+
+export const recurringTransactionSchema = z.object({
+  description: descriptionSchema,
+  amount: amountSchema,
+  categoryId: categoryIdSchema,
+  transactionType: z.enum(["income", "expense"]),
+  repeatFrequency: repeatFrequencySchema,
+  startDate: transactionDateStringSchema,
+  endDate: transactionDateStringSchema.optional().nullable(),
+});
+
 /**
  * Search schema for dashboard with cashflow year filter
  */

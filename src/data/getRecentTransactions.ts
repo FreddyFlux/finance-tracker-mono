@@ -17,14 +17,15 @@ export const getRecentTransactions = createServerFn({
         transactionDate: transactionsTable.transactionDate,
         category: categoriesTable.name,
         transactionType: categoriesTable.type,
+        recurringTransactionId: transactionsTable.recurringTransactionId,
       })
       .from(transactionsTable)
-      .where(eq(transactionsTable.userId, context.userId))
-      .orderBy(desc(transactionsTable.transactionDate))
       .leftJoin(
         categoriesTable,
         eq(transactionsTable.categoryId, categoriesTable.id)
       )
+      .where(eq(transactionsTable.userId, context.userId))
+      .orderBy(desc(transactionsTable.transactionDate))
       .limit(5);
     return transactions;
   });

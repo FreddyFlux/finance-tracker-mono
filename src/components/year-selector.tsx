@@ -20,24 +20,21 @@ export function YearSelector({
 }: YearSelectorProps) {
   const { yearsRange, isLoading } = useAppContext();
 
-  if (isLoading) {
-    return (
-      <SelectTrigger className={className} disabled>
-        <SelectValue placeholder="Loading..." />
-      </SelectTrigger>
-    );
-  }
+  // Ensure we always have at least the current year
+  const currentYear = new Date().getFullYear();
+  const displayYears = yearsRange.length > 0 ? yearsRange : [currentYear];
 
   return (
     <Select
       value={value.toString()}
       onValueChange={(val) => onValueChange(Number(val))}
+      disabled={isLoading}
     >
       <SelectTrigger className={className}>
-        <SelectValue />
+        <SelectValue placeholder={isLoading ? "Loading..." : undefined} />
       </SelectTrigger>
       <SelectContent>
-        {yearsRange.map((year) => (
+        {displayYears.map((year) => (
           <SelectItem key={year.toString()} value={year.toString()}>
             {year}
           </SelectItem>

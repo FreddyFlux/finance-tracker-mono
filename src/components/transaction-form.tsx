@@ -8,6 +8,8 @@ import {
   amountSchema,
   descriptionSchema,
   categoryIdSchema,
+  repeatFrequencySchema,
+  transactionDateStringSchema,
 } from "@/lib/validation";
 import { sanitizeDescription } from "@/lib/sanitize";
 
@@ -33,13 +35,29 @@ import { CalendarIcon } from "lucide-react";
 import { Input } from "./ui/input";
 import { useAppContext } from "@/contexts/app-context";
 
-export const transactionFormSchema = z.object({
-  transactionType: z.enum(["income", "expense"]),
-  categoryId: categoryIdSchema,
-  transactionDate: transactionDateSchema,
-  amount: amountSchema,
-  description: descriptionSchema.transform(sanitizeDescription),
-});
+export const transactionFormSchema = z
+	.object({
+		transactionType: z.enum(["income", "expense"]),
+		categoryId: categoryIdSchema,
+		transactionDate: transactionDateSchema,
+		amount: amountSchema,
+		description: descriptionSchema.transform(sanitizeDescription),
+		isRecurring: z.boolean().default(false),
+		repeatFrequency: repeatFrequencySchema.optional(),
+		endDate: z.date().optional().nullable(),
+	})
+	.refine(
+		(data) => {
+			if (data.isRecurring) {
+				return data.repeatFrequency !== undefined;
+			}
+			return true;
+		},
+		{
+			message: "Repeat frequency is required for recurring transactions",
+			path: ["repeatFrequency"],
+		},
+	);
 
 type TransactionFormData = z.infer<typeof transactionFormSchema>;
 
@@ -66,11 +84,15 @@ export function TransactionForm({
       categoryId: 0,
       description: "",
       transactionDate: new Date(),
+      isRecurring: false,
+      repeatFrequency: undefined,
+      endDate: null,
       ...defaultValues,
     },
   });
 
   const transactionType = form.watch("transactionType");
+  const isRecurring = form.watch("isRecurring");
 
   const filteredCategories = isLoading
     ? []
@@ -91,6 +113,16 @@ export function TransactionForm({
       }
     }
   }, [transactionType, form, categories]);
+
+  // Reset repeat fields when isRecurring is unchecked
+  useEffect(() => {
+    if (!isRecurring) {
+      form.setValue("repeatFrequency", undefined);
+      form.setValue("endDate", null);
+      form.clearErrors("repeatFrequency");
+      form.clearErrors("endDate");
+    }
+  }, [isRecurring, form]);
 
   return (
     <Form {...form}>
@@ -247,6 +279,100 @@ export function TransactionForm({
               );
             }}
           />
+          {/* RECURRING TRANSACTION OPTIONS */}
+          <FormField
+            control={form.control}
+            name="isRecurring"
+            render={({ field }) => {
+              return (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Make this transaction recurring</FormLabel>
+                  </div>
+                </FormItem>
+              );
+            }}
+          />
+          {isRecurring && (
+            <>
+              <FormField
+                control={form.control}
+                name="repeatFrequency"
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <FormLabel>Repeat Frequency</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select frequency" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="monthly">Monthly</SelectItem>
+                            <SelectItem value="yearly">Yearly</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <FormLabel>End Date (Optional)</FormLabel>
+                      <FormControl>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="justify-start font-normal w-full"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {field.value
+                                ? formatDisplayDate(field.value)
+                                : "No end date"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-auto overflow-hidden p-0"
+                            align="start"
+                          >
+                            <Calendar
+                              mode="single"
+                              selected={field.value ?? undefined}
+                              defaultMonth={field.value ?? new Date()}
+                              captionLayout="dropdown"
+                              onSelect={(date) => {
+                                field.onChange(date ?? null);
+                              }}
+                              disabled={{ before: form.getValues("transactionDate") }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+            </>
+          )}
           <Button type="submit" className="w-full">
             {form.formState.isSubmitting ? "Submitting..." : "Submit"}
           </Button>

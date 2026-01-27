@@ -4,6 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, sql } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
+import { generateRecurringTransactionsForYear } from "./generateRecurringTransactions";
 
 const schema = z.object({
   year: z.number(),
@@ -15,6 +16,12 @@ export const getAnnualCashflow = createServerFn({
   .middleware([authMiddleware])
   .inputValidator((data: z.infer<typeof schema>) => schema.parse(data))
   .handler(async ({ context, data }) => {
+    // Generate recurring transactions for the requested year
+    await generateRecurringTransactionsForYear({
+      userId: context.userId,
+      year: data.year,
+    });
+
     const cashflow = await db
       .select({
         month: sql<string>`EXTRACT(MONTH FROM ${transactionsTable.transactionDate})`,

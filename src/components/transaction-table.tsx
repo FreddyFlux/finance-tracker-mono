@@ -10,9 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { formatDisplayDate, formatCurrency } from "@/lib/formatters";
-import { Transaction, TransactionType } from "@/lib/types";
+import type { Transaction, TransactionType } from "@/lib/types";
 import { TRANSACTION_TYPE_COLORS } from "@/lib/constants";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, RepeatIcon } from "lucide-react";
 import { useRouter } from "@tanstack/react-router";
 
 interface TransactionTableProps {
@@ -42,7 +42,17 @@ export function TransactionTable({
         {transactions.map((transaction) => (
           <TableRow key={transaction.id}>
             <TableCell>{formatDisplayDate(transaction.transactionDate)}</TableCell>
-            <TableCell>{transaction.description}</TableCell>
+            <TableCell>
+              <div className="flex items-center gap-2">
+                {transaction.description}
+                {transaction.recurringTransactionId && (
+                  <Badge variant="outline" className="text-xs">
+                    <RepeatIcon className="h-3 w-3 mr-1" />
+                    Recurring
+                  </Badge>
+                )}
+              </div>
+            </TableCell>
             <TableCell className="capitalize">
               <TransactionTypeBadge transactionType={transaction.transactionType} />
             </TableCell>
