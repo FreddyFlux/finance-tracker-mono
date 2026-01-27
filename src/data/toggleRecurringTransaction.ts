@@ -1,9 +1,9 @@
-import db from "@/db";
-import { recurringTransactionsTable } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
+import db from "@/db";
+import { recurringTransactionsTable } from "@/db/schema";
 import { recurringTransactionIdSchema } from "@/lib/validation";
 
 const schema = z.object({

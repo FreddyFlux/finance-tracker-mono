@@ -15,7 +15,6 @@ const config = defineConfig({
     tanstackStart(),
     viteReact({
       jsxRuntime: "automatic",
-      fastRefresh: true,
     }),
   ],
   server: {

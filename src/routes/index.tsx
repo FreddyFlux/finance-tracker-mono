@@ -1,13 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import cover from "../../public/save-money.jpg";
-import { ChartColumnBigIcon } from "lucide-react";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   SignUpButton,
 } from "@clerk/tanstack-react-start";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ChartColumnBigIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import cover from "../../public/save-money.jpg";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -17,7 +17,7 @@ function App() {
       <img
         src={cover}
         className="absolute top-0 left-0 size-full object-cover object-center opacity-40"
-        alt="cover image"
+        alt="Cover"
       />
       <div className="flex flex-col text-center gap-4 relative z-10">
         <h1 className="text-4xl font-bold flex gap-1 items-center justify-center">

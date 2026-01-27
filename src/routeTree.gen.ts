@@ -13,7 +13,9 @@ import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
 import { Route as AuthedDashboardTransactionsLayoutRouteImport } from './routes/_authed/dashboard/transactions/_layout'
+import { Route as AuthedDashboardConnectionsLayoutRouteImport } from './routes/_authed/dashboard/connections/_layout'
 import { Route as AuthedDashboardTransactionsLayoutIndexRouteImport } from './routes/_authed/dashboard/transactions/_layout.index'
+import { Route as AuthedDashboardConnectionsLayoutIndexRouteImport } from './routes/_authed/dashboard/connections/_layout.index'
 import { Route as AuthedDashboardTransactionsNewLayoutRouteImport } from './routes/_authed/dashboard/transactions/new/_layout'
 import { Route as AuthedDashboardTransactionsTransactionIdLayoutRouteImport } from './routes/_authed/dashboard/transactions/$transactionId/_layout'
 import { Route as AuthedDashboardTransactionsNewLayoutIndexRouteImport } from './routes/_authed/dashboard/transactions/new/_layout.index'
@@ -39,11 +41,23 @@ const AuthedDashboardTransactionsLayoutRoute =
     path: '/dashboard/transactions',
     getParentRoute: () => AuthedRoute,
   } as any)
+const AuthedDashboardConnectionsLayoutRoute =
+  AuthedDashboardConnectionsLayoutRouteImport.update({
+    id: '/dashboard/connections/_layout',
+    path: '/dashboard/connections',
+    getParentRoute: () => AuthedRoute,
+  } as any)
 const AuthedDashboardTransactionsLayoutIndexRoute =
   AuthedDashboardTransactionsLayoutIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => AuthedDashboardTransactionsLayoutRoute,
+  } as any)
+const AuthedDashboardConnectionsLayoutIndexRoute =
+  AuthedDashboardConnectionsLayoutIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthedDashboardConnectionsLayoutRoute,
   } as any)
 const AuthedDashboardTransactionsNewLayoutRoute =
   AuthedDashboardTransactionsNewLayoutRouteImport.update({
@@ -73,9 +87,11 @@ const AuthedDashboardTransactionsTransactionIdLayoutIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/dashboard/connections': typeof AuthedDashboardConnectionsLayoutRouteWithChildren
   '/dashboard/transactions': typeof AuthedDashboardTransactionsLayoutRouteWithChildren
   '/dashboard/transactions/$transactionId': typeof AuthedDashboardTransactionsTransactionIdLayoutRouteWithChildren
   '/dashboard/transactions/new': typeof AuthedDashboardTransactionsNewLayoutRouteWithChildren
+  '/dashboard/connections/': typeof AuthedDashboardConnectionsLayoutIndexRoute
   '/dashboard/transactions/': typeof AuthedDashboardTransactionsLayoutIndexRoute
   '/dashboard/transactions/$transactionId/': typeof AuthedDashboardTransactionsTransactionIdLayoutIndexRoute
   '/dashboard/transactions/new/': typeof AuthedDashboardTransactionsNewLayoutIndexRoute
@@ -83,6 +99,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
+  '/dashboard/connections': typeof AuthedDashboardConnectionsLayoutIndexRoute
   '/dashboard/transactions': typeof AuthedDashboardTransactionsLayoutIndexRoute
   '/dashboard/transactions/$transactionId': typeof AuthedDashboardTransactionsTransactionIdLayoutIndexRoute
   '/dashboard/transactions/new': typeof AuthedDashboardTransactionsNewLayoutIndexRoute
@@ -92,9 +109,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/_authed/dashboard/connections/_layout': typeof AuthedDashboardConnectionsLayoutRouteWithChildren
   '/_authed/dashboard/transactions/_layout': typeof AuthedDashboardTransactionsLayoutRouteWithChildren
   '/_authed/dashboard/transactions/$transactionId/_layout': typeof AuthedDashboardTransactionsTransactionIdLayoutRouteWithChildren
   '/_authed/dashboard/transactions/new/_layout': typeof AuthedDashboardTransactionsNewLayoutRouteWithChildren
+  '/_authed/dashboard/connections/_layout/': typeof AuthedDashboardConnectionsLayoutIndexRoute
   '/_authed/dashboard/transactions/_layout/': typeof AuthedDashboardTransactionsLayoutIndexRoute
   '/_authed/dashboard/transactions/$transactionId/_layout/': typeof AuthedDashboardTransactionsTransactionIdLayoutIndexRoute
   '/_authed/dashboard/transactions/new/_layout/': typeof AuthedDashboardTransactionsNewLayoutIndexRoute
@@ -104,9 +123,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard/'
+    | '/dashboard/connections'
     | '/dashboard/transactions'
     | '/dashboard/transactions/$transactionId'
     | '/dashboard/transactions/new'
+    | '/dashboard/connections/'
     | '/dashboard/transactions/'
     | '/dashboard/transactions/$transactionId/'
     | '/dashboard/transactions/new/'
@@ -114,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/dashboard/connections'
     | '/dashboard/transactions'
     | '/dashboard/transactions/$transactionId'
     | '/dashboard/transactions/new'
@@ -122,9 +144,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/_authed/dashboard/'
+    | '/_authed/dashboard/connections/_layout'
     | '/_authed/dashboard/transactions/_layout'
     | '/_authed/dashboard/transactions/$transactionId/_layout'
     | '/_authed/dashboard/transactions/new/_layout'
+    | '/_authed/dashboard/connections/_layout/'
     | '/_authed/dashboard/transactions/_layout/'
     | '/_authed/dashboard/transactions/$transactionId/_layout/'
     | '/_authed/dashboard/transactions/new/_layout/'
@@ -165,12 +189,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedDashboardTransactionsLayoutRouteImport
       parentRoute: typeof AuthedRoute
     }
+    '/_authed/dashboard/connections/_layout': {
+      id: '/_authed/dashboard/connections/_layout'
+      path: '/dashboard/connections'
+      fullPath: '/dashboard/connections'
+      preLoaderRoute: typeof AuthedDashboardConnectionsLayoutRouteImport
+      parentRoute: typeof AuthedRoute
+    }
     '/_authed/dashboard/transactions/_layout/': {
       id: '/_authed/dashboard/transactions/_layout/'
       path: '/'
       fullPath: '/dashboard/transactions/'
       preLoaderRoute: typeof AuthedDashboardTransactionsLayoutIndexRouteImport
       parentRoute: typeof AuthedDashboardTransactionsLayoutRoute
+    }
+    '/_authed/dashboard/connections/_layout/': {
+      id: '/_authed/dashboard/connections/_layout/'
+      path: '/'
+      fullPath: '/dashboard/connections/'
+      preLoaderRoute: typeof AuthedDashboardConnectionsLayoutIndexRouteImport
+      parentRoute: typeof AuthedDashboardConnectionsLayoutRoute
     }
     '/_authed/dashboard/transactions/new/_layout': {
       id: '/_authed/dashboard/transactions/new/_layout'
@@ -202,6 +240,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthedDashboardConnectionsLayoutRouteChildren {
+  AuthedDashboardConnectionsLayoutIndexRoute: typeof AuthedDashboardConnectionsLayoutIndexRoute
+}
+
+const AuthedDashboardConnectionsLayoutRouteChildren: AuthedDashboardConnectionsLayoutRouteChildren =
+  {
+    AuthedDashboardConnectionsLayoutIndexRoute:
+      AuthedDashboardConnectionsLayoutIndexRoute,
+  }
+
+const AuthedDashboardConnectionsLayoutRouteWithChildren =
+  AuthedDashboardConnectionsLayoutRoute._addFileChildren(
+    AuthedDashboardConnectionsLayoutRouteChildren,
+  )
 
 interface AuthedDashboardTransactionsLayoutRouteChildren {
   AuthedDashboardTransactionsLayoutIndexRoute: typeof AuthedDashboardTransactionsLayoutIndexRoute
@@ -250,6 +303,7 @@ const AuthedDashboardTransactionsNewLayoutRouteWithChildren =
 
 interface AuthedRouteChildren {
   AuthedDashboardIndexRoute: typeof AuthedDashboardIndexRoute
+  AuthedDashboardConnectionsLayoutRoute: typeof AuthedDashboardConnectionsLayoutRouteWithChildren
   AuthedDashboardTransactionsLayoutRoute: typeof AuthedDashboardTransactionsLayoutRouteWithChildren
   AuthedDashboardTransactionsTransactionIdLayoutRoute: typeof AuthedDashboardTransactionsTransactionIdLayoutRouteWithChildren
   AuthedDashboardTransactionsNewLayoutRoute: typeof AuthedDashboardTransactionsNewLayoutRouteWithChildren
@@ -257,6 +311,8 @@ interface AuthedRouteChildren {
 
 const AuthedRouteChildren: AuthedRouteChildren = {
   AuthedDashboardIndexRoute: AuthedDashboardIndexRoute,
+  AuthedDashboardConnectionsLayoutRoute:
+    AuthedDashboardConnectionsLayoutRouteWithChildren,
   AuthedDashboardTransactionsLayoutRoute:
     AuthedDashboardTransactionsLayoutRouteWithChildren,
   AuthedDashboardTransactionsTransactionIdLayoutRoute:

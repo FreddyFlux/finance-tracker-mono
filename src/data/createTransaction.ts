@@ -1,42 +1,42 @@
-import db from "@/db";
-import { transactionsTable } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-import {
-  transactionDateStringSchema,
-  amountSchema,
-  descriptionSchema,
-  categoryIdSchema,
-} from "@/lib/validation";
+import db from "@/db";
+import { transactionsTable } from "@/db/schema";
 import { sanitizeDescription } from "@/lib/sanitize";
+import {
+	amountSchema,
+	categoryIdSchema,
+	descriptionSchema,
+	transactionDateStringSchema,
+} from "@/lib/validation";
 
 const transactionSchema = z.object({
-  transactionType: z.enum(["income", "expense"]),
-  categoryId: categoryIdSchema,
-  transactionDate: transactionDateStringSchema,
-  amount: amountSchema,
-  description: descriptionSchema.transform(sanitizeDescription),
+	transactionType: z.enum(["income", "expense"]),
+	categoryId: categoryIdSchema,
+	transactionDate: transactionDateStringSchema,
+	amount: amountSchema,
+	description: descriptionSchema.transform(sanitizeDescription),
 });
 
 export const createTransaction = createServerFn({
-  method: "POST",
+	method: "POST",
 })
-  .middleware([authMiddleware])
-  .inputValidator((data: z.infer<typeof transactionSchema>) => {
-    return transactionSchema.parse(data);
-  })
-  .handler(async ({ data, context }) => {
-    const userId = context.userId;
-    const transaction = await db
-      .insert(transactionsTable)
-      .values({
-        userId,
-        amount: data.amount.toString(),
-        description: data.description,
-        transactionDate: data.transactionDate,
-        categoryId: data.categoryId,
-      })
-      .returning();
-    return transaction;
-  });
+	.middleware([authMiddleware])
+	.inputValidator((data: z.infer<typeof transactionSchema>) => {
+		return transactionSchema.parse(data);
+	})
+	.handler(async ({ data, context }) => {
+		const userId = context.userId;
+		const transaction = await db
+			.insert(transactionsTable)
+			.values({
+				userId,
+				amount: data.amount.toString(),
+				description: data.description,
+				transactionDate: data.transactionDate,
+				categoryId: data.categoryId,
+			})
+			.returning();
+		return transaction;
+	});

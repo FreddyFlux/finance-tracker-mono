@@ -9,9 +9,13 @@
     "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
-    "check": "biome check"
+    "check": "biome check",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "@clerk/tanstack-react-start": "^0.27.14",
     "@fontsource/poppins": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",

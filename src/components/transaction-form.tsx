@@ -1,18 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CalendarIcon } from "lucide-react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppContext } from "@/contexts/app-context";
 import { formatDisplayDate } from "@/lib/formatters";
-import { useEffect } from "react";
-import {
-  transactionDateSchema,
-  amountSchema,
-  descriptionSchema,
-  categoryIdSchema,
-  repeatFrequencySchema,
-  transactionDateStringSchema,
-} from "@/lib/validation";
 import { sanitizeDescription } from "@/lib/sanitize";
-
+import {
+  amountSchema,
+  categoryIdSchema,
+  descriptionSchema,
+  repeatFrequencySchema,
+  transactionDateSchema,
+} from "@/lib/validation";
+import { Button } from "./ui/button";
+import { Calendar } from "./ui/calendar";
 import {
   Form,
   FormControl,
@@ -21,6 +23,8 @@ import {
   FormLabel,
   FormMessage,
 } from "./ui/form";
+import { Input } from "./ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
   Select,
   SelectContent,
@@ -28,36 +32,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Calendar } from "./ui/calendar";
-import { Button } from "./ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { Input } from "./ui/input";
-import { useAppContext } from "@/contexts/app-context";
 
 export const transactionFormSchema = z
-	.object({
-		transactionType: z.enum(["income", "expense"]),
-		categoryId: categoryIdSchema,
-		transactionDate: transactionDateSchema,
-		amount: amountSchema,
-		description: descriptionSchema.transform(sanitizeDescription),
-		isRecurring: z.boolean().default(false),
-		repeatFrequency: repeatFrequencySchema.optional(),
-		endDate: z.date().optional().nullable(),
-	})
-	.refine(
-		(data) => {
-			if (data.isRecurring) {
-				return data.repeatFrequency !== undefined;
-			}
-			return true;
-		},
-		{
-			message: "Repeat frequency is required for recurring transactions",
-			path: ["repeatFrequency"],
-		},
-	);
+  .object({
+    transactionType: z.enum(["income", "expense"]),
+    categoryId: categoryIdSchema,
+    transactionDate: transactionDateSchema,
+    amount: amountSchema,
+    description: descriptionSchema.transform(sanitizeDescription),
+    isRecurring: z.boolean().default(false),
+    repeatFrequency: repeatFrequencySchema.optional(),
+    endDate: z.date().optional().nullable(),
+  })
+  .refine(
+    (data) => {
+      if (data.isRecurring) {
+        return data.repeatFrequency !== undefined;
+      }
+      return true;
+    },
+    {
+      message: "Repeat frequency is required for recurring transactions",
+      path: ["repeatFrequency"],
+    }
+  );
 
 type TransactionFormData = z.infer<typeof transactionFormSchema>;
 
@@ -76,6 +74,7 @@ export function TransactionForm({
 }) {
   const { categories, isLoading } = useAppContext();
   const form = useForm<TransactionFormData>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- zodResolver type incompatibility with react-hook-form
     resolver: zodResolver(transactionFormSchema) as any,
     mode: "onSubmit",
     defaultValues: {
@@ -361,7 +360,9 @@ export function TransactionForm({
                               onSelect={(date) => {
                                 field.onChange(date ?? null);
                               }}
-                              disabled={{ before: form.getValues("transactionDate") }}
+                              disabled={{
+                                before: form.getValues("transactionDate"),
+                              }}
                             />
                           </PopoverContent>
                         </Popover>

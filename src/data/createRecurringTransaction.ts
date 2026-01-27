@@ -1,11 +1,10 @@
-import db from "@/db";
-import { recurringTransactionsTable } from "@/db/schema";
 import { createServerFn } from "@tanstack/react-start";
 import authMiddleware from "middlewares/authMiddleware";
-import z from "zod";
-import { recurringTransactionSchema } from "@/lib/validation";
+import type z from "zod";
+import db from "@/db";
+import { recurringTransactionsTable } from "@/db/schema";
+import { getCurrentYear, recurringTransactionSchema } from "@/lib/validation";
 import { generateRecurringTransactionsForYear } from "./generateRecurringTransactions";
-import { getCurrentYear } from "@/lib/validation";
 
 export const createRecurringTransaction = createServerFn({
 	method: "POST",
