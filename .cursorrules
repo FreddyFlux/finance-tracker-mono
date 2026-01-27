@@ -1,0 +1,455 @@
+# TanStack Start Transaction Tracker - Cursor Rules
+
+## Project Overview
+
+This is a **TanStack Start** (full-stack React framework) application for tracking personal financial transactions. The application uses:
+- **TanStack Router** for file-based routing with SSR
+- **Clerk** for authentication
+- **Drizzle ORM** with PostgreSQL (Neon) for database operations
+- **React Hook Form** with **Zod** for form validation
+- **Tailwind CSS** for styling with **shadcn/ui** components
+- **Recharts** for data visualization
+- **Biome** for linting and formatting
+
+## Architecture Principles
+
+### 1. File-Based Routing (TanStack Router)
+- Routes are defined in `src/routes/` directory using file-based conventions
+- Route files export a `Route` object created with `createFileRoute()`
+- Use `_layout.tsx` files for nested route layouts
+- Use `-` prefix for co-located components (e.g., `-cashflow.tsx`)
+- Route parameters use `$` prefix (e.g., `$transactionId`)
+- Protected routes are nested under `_authed/` directory
+
+### 2. Server Functions Pattern
+- All data operations use `createServerFn()` from `@tanstack/react-start`
+- Server functions are located in `src/data/` directory
+- Always use `authMiddleware` for authenticated endpoints
+- Use Zod schemas for input validation via `.inputValidator()`
+- Server functions follow naming: `get*`, `create*`, `update*`, `delete*`
+
+### 3. Data Layer Architecture
+- **Database**: Drizzle ORM with PostgreSQL schema in `src/db/schema.ts`
+- **Connection**: Single `db` export from `src/db/index.ts` using Neon serverless
+- **Queries**: Use Drizzle query builder with proper type inference
+- **Validation**: All inputs validated with Zod schemas before database operations
+- **Sanitization**: User inputs sanitized using `src/lib/sanitize.ts` functions
+
+## File Structure Conventions
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui base components
+│   └── *.tsx           # Feature-specific components
+├── contexts/           # React context providers
+├── data/               # Server functions (API layer)
+├── db/                 # Database schema and connection
+├── lib/                # Utility functions and constants
+├── routes/             # TanStack Router file-based routes
+│   ├── __root.tsx      # Root route with layout
+│   ├── _authed.tsx     # Auth guard route
+│   └── _authed/        # Protected routes
+└── router.tsx          # Router configuration
+```
+
+## Coding Standards
+
+### TypeScript
+- Use strict TypeScript configuration
+- Prefer type inference where possible
+- Use `z.infer<typeof schema>` for Zod schema types
+- Export types from `src/lib/types.ts` for shared types
+- Use `as const` for literal type inference in constants
+
+### Import Organization
+- Group imports: external packages → internal modules → relative imports
+- Use path aliases (`@/`) for all internal imports
+- Biome auto-organizes imports on save
+
+### Component Patterns
+
+#### Functional Components
+- Use function declarations for components
+- Props interfaces defined inline or exported if reused
+- Use descriptive component names matching file names
+
+#### Form Components
+- Use `react-hook-form` with `zodResolver` for validation
+- Form schemas defined in component file or `src/lib/validation.ts`
+- Use `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage` from `@/components/ui/form`
+- Transform inputs using Zod `.transform()` for sanitization
+- Disable form during submission using `fieldset` with `disabled` prop
+
+#### Loading States
+- Use `pendingComponent` in route definitions for loading states
+- Use `LoadingSkeleton` component for consistent loading UI
+- Show loading states in context providers (e.g., `isLoading` in `AppContext`)
+
+#### Error Handling
+- Use `errorComponent` in route definitions for error boundaries
+- Show user-friendly error messages
+- Use toast notifications for success/error feedback (`showSuccessToast`, `showErrorToast`)
+
+### Route Patterns
+
+#### Route Definition Structure
+```typescript
+export const Route = createFileRoute("/path/to/route")({
+  // Search params validation
+  validateSearch: schema,
+  
+  // Loader dependencies
+  loaderDeps: ({ search }) => ({ ... }),
+  
+  // Data loading
+  loader: async ({ deps, context }) => {
+    // Fetch data
+    return { data };
+  },
+  
+  // Loading component
+  pendingComponent: () => <LoadingSkeleton />,
+  
+  // Error component
+  errorComponent: ({ error }) => <ErrorDisplay />,
+  
+  // Route component
+  component: RouteComponent,
+});
+```
+
+#### Protected Routes
+- Use `beforeLoad` in `_authed.tsx` to check `context.userId`
+- Redirect to `/` if not authenticated
+- Access user ID via `context.userId` in loaders and server functions
+
+#### Search Params
+- Define search param schemas in `src/lib/validation.ts`
+- Use `validateSearch` in route definitions
+- Access via `Route.useSearch()` or `loaderDeps`
+- Use `navigate()` with `search` option to update URL params
+
+### Data Fetching Patterns
+
+#### Server Functions
+```typescript
+export const getData = createServerFn({
+  method: "GET", // or "POST"
+})
+  .middleware([authMiddleware]) // Always for protected routes
+  .inputValidator((data) => schema.parse(data)) // Zod validation
+  .handler(async ({ context, data }) => {
+    // Database operations
+    return result;
+  });
+```
+
+#### Client-Side Usage
+- Call server functions directly (no fetch needed)
+- Handle async/await properly
+- Use in route loaders or component effects
+- Server functions are type-safe and auto-imported
+
+### Database Patterns
+
+#### Schema Definition
+- Use Drizzle ORM table definitions in `src/db/schema.ts`
+- Use `pgTable()` for PostgreSQL tables
+- Use proper types: `text()`, `integer()`, `numeric()`, `date()`
+- Use `.references()` for foreign keys
+- Use `.generatedAlwaysAsIdentity()` for auto-increment IDs
+
+#### Queries
+- Use Drizzle query builder with type inference
+- Join tables using `.leftJoin()` or `.innerJoin()`
+- Use `and()`, `eq()`, `gte()`, `lte()` for where conditions
+- Use `orderBy()` with `desc()` or `asc()`
+- Format dates using `date-fns` `format()` for database queries
+
+#### Transactions
+- Store amounts as `numeric()` type (strings in DB)
+- Convert to numbers when calculating
+- Use `formatApiDate()` for date storage (yyyy-MM-dd format)
+
+### Validation Patterns
+
+#### Zod Schemas
+- Define reusable schemas in `src/lib/validation.ts`
+- Use `.coerce` for type coercion (e.g., `z.coerce.number()`)
+- Use `.transform()` for sanitization
+- Use `.catch()` for default values in optional schemas
+- Export schemas for reuse across forms and server functions
+
+#### Common Schemas
+- `transactionDateSchema`: Date validation (max: today)
+- `amountSchema`: Positive number validation
+- `descriptionSchema`: String length validation (3-300 chars)
+- `categoryIdSchema`: Positive number validation
+- `yearSchema`: Year range validation
+- `monthSchema`: Month validation (1-12)
+
+### Styling Conventions
+
+#### Tailwind CSS
+- Use Tailwind utility classes exclusively
+- Use `cn()` utility from `@/lib/utils` for conditional classes
+- Follow mobile-first responsive design
+- Use semantic color classes: `text-muted-foreground`, `bg-primary`, etc.
+
+#### Component Styling
+- Use shadcn/ui components from `@/components/ui/`
+- Extend base components when needed
+- Use `className` prop for style overrides
+- Follow shadcn/ui patterns for component composition
+
+#### Layout Patterns
+- Use `max-w-7xl mx-auto` for main content containers
+- Use `py-5 px-3` for consistent padding
+- Use Card components for content sections
+- Use flexbox/grid for layouts (`flex`, `grid`, `grid-cols-*`)
+
+### Context Patterns
+
+#### App Context
+- Located in `src/contexts/app-context.tsx`
+- Provides global app state: `categories`, `yearsRange`, `isLoading`
+- Includes refetch functions for cache invalidation
+- Use `useAppContext()` hook to access context
+- Always check `isLoading` before using context data
+
+### Constants and Configuration
+
+#### Constants File
+- All constants in `src/lib/constants.ts`
+- Use `as const` for type safety
+- Group related constants in objects:
+  - `TRANSACTION_LIMITS`: Business logic limits
+  - `DATE_FORMATS`: Date formatting strings
+  - `CURRENCY_SYMBOL`: Currency display
+  - `TRANSACTION_TYPE_COLORS`: UI color mappings
+
+### Formatters
+
+#### Date Formatting
+- Use `date-fns` `format()` function
+- Use constants from `DATE_FORMATS` for format strings
+- Functions in `src/lib/formatters.ts`:
+  - `formatDisplayDate()`: User-facing dates
+  - `formatApiDate()`: Database dates (yyyy-MM-dd)
+  - `formatMonth()`, `formatFullMonth()`, `formatMonthYear()`: Month formatting
+
+#### Currency Formatting
+- Use `numeral` library for number formatting
+- Use `formatCurrency()` for display (default: no decimals)
+- Use `formatCurrencyChart()` for chart labels
+- Always use `CURRENCY_SYMBOL` constant
+
+### Authentication Patterns
+
+#### Middleware
+- Auth middleware in `middlewares/authMiddleware.ts`
+- Uses Clerk's `auth()` server function
+- Adds `userId` to context
+- Throws error if unauthorized
+
+#### User ID Access
+- Access via `context.userId` in server functions
+- Access via `context.userId` in route `beforeLoad`
+- Use `getSignedInUserId()` helper for root route
+
+#### Protected Routes
+- Wrap protected routes in `_authed.tsx` layout
+- Check `context.userId` in `beforeLoad`
+- Redirect to `/` if not authenticated
+
+### Error Handling
+
+#### Route Errors
+- Define `errorComponent` in route definitions
+- Display user-friendly error messages
+- Use consistent error UI patterns
+
+#### Toast Notifications
+- Use `showSuccessToast()` for success messages
+- Use `showErrorToast()` for error messages
+- Import from `@/lib/toast`
+- Include optional description parameter
+
+#### Form Errors
+- React Hook Form handles validation errors automatically
+- Use `FormMessage` component to display errors
+- Errors come from Zod schema validation
+
+### Navigation Patterns
+
+#### Link Navigation
+- Use `Link` component from `@tanstack/react-router`
+- Use `to` prop for route paths
+- Use `params` for route parameters
+- Use `search` for query parameters
+- Use `asChild` with Button for styled links
+
+#### Programmatic Navigation
+- Use `useNavigate()` hook
+- Call `navigate()` with route options
+- Clear cache when needed: `router.clearCache()`
+
+### Component Composition
+
+#### Reusable Components
+- Create components in `src/components/` for reuse
+- Use props interfaces for type safety
+- Export components as named exports
+- Co-locate related components in same directory
+
+#### UI Components
+- shadcn/ui components in `src/components/ui/`
+- Don't modify base UI components directly
+- Extend via composition or className overrides
+
+### Performance Considerations
+
+#### Data Loading
+- Use route loaders for initial data fetching
+- Use `Promise.all()` for parallel data fetching
+- Use `loaderDeps` to control loader re-execution
+- Cache data in context when appropriate
+
+#### Code Splitting
+- TanStack Router handles automatic code splitting
+- Use dynamic imports for heavy components if needed
+
+#### Font Loading
+- Import only needed font weights (400, 500, 600, 700)
+- Use `?url` import for CSS files
+
+## Development Guidelines
+
+### Adding New Features
+
+1. **New Route**: Create file in `src/routes/` following naming conventions
+2. **New Server Function**: Create in `src/data/` with proper validation
+3. **New Component**: Create in `src/components/` or co-locate with route
+4. **New Validation**: Add schema to `src/lib/validation.ts`
+5. **New Constant**: Add to `src/lib/constants.ts`
+
+### Database Changes
+
+1. Update schema in `src/db/schema.ts`
+2. Run migrations using Drizzle Kit
+3. Update types if needed
+4. Update server functions that use changed tables
+
+### Form Handling
+
+1. Define Zod schema (reuse from `validation.ts` when possible)
+2. Use `react-hook-form` with `zodResolver`
+3. Use shadcn/ui Form components
+4. Sanitize inputs using `.transform()` in schema
+5. Handle submission with proper error handling
+
+### Testing Considerations
+
+- Use Vitest for unit tests
+- Use Testing Library for component tests
+- Test server functions with proper auth context
+- Test validation schemas independently
+
+## Code Quality
+
+### Linting and Formatting
+- Biome handles linting and formatting
+- Use tabs for indentation (configured in `biome.json`)
+- Use double quotes for strings
+- Run `npm run check` before committing
+
+### Type Safety
+- Avoid `any` types
+- Use proper type inference
+- Leverage Zod for runtime type safety
+- Use Drizzle's type inference for database queries
+
+### Best Practices
+- Keep components small and focused
+- Extract reusable logic to utilities
+- Use meaningful variable and function names
+- Add JSDoc comments for complex functions
+- Handle edge cases (empty states, loading states, errors)
+
+## Common Patterns Reference
+
+### Route with Search Params
+```typescript
+export const Route = createFileRoute("/path")({
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ param: search.param }),
+  loader: async ({ deps }) => {
+    const data = await getData({ data: { param: deps.param } });
+    return { data };
+  },
+  component: Component,
+});
+```
+
+### Server Function with Auth
+```typescript
+export const getData = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .inputValidator((data) => schema.parse(data))
+  .handler(async ({ context, data }) => {
+    // Use context.userId for user-specific queries
+    return result;
+  });
+```
+
+### Form with Validation
+```typescript
+const form = useForm<FormData>({
+  resolver: zodResolver(schema),
+  defaultValues: { ... },
+});
+```
+
+### Context Usage
+```typescript
+const { categories, yearsRange, isLoading } = useAppContext();
+if (isLoading) return <LoadingSkeleton />;
+```
+
+## Important Notes
+
+- **Never** modify `routeTree.gen.ts` (auto-generated)
+- **Always** use path aliases (`@/`) for internal imports
+- **Always** validate and sanitize user inputs
+- **Always** use auth middleware for protected server functions
+- **Always** handle loading and error states
+- **Always** use constants instead of magic numbers/strings
+- **Always** format dates and currency using formatter functions
+- **Always** use TypeScript types from Zod schemas
+- **Always** use Drizzle query builder (never raw SQL)
+
+## Project-Specific Conventions
+
+### Transaction Types
+- Use `"income"` or `"expense"` as literal types
+- Filter categories by transaction type
+- Use `TRANSACTION_TYPE_COLORS` for badge colors
+
+### Date Handling
+- Store dates as `date` type in database
+- Use `Date` objects in forms
+- Convert between formats using formatters
+- Never allow future dates for transactions
+
+### Amount Handling
+- Store as `numeric()` (string) in database
+- Convert to number for calculations
+- Display with currency symbol and formatting
+- Always validate as positive number
+
+### Category Management
+- Categories are pre-defined in database
+- Filter by transaction type (income/expense)
+- Use category ID for foreign key relationship
+- Categories loaded via AppContext
