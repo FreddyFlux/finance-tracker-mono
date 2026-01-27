@@ -15,15 +15,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { deleteTransaction } from "@/data/deleteTransaction";
-import { getCategories } from "@/data/getCategories";
 import { getTransaction } from "@/data/getTransaction";
 import { updateTransaction } from "@/data/updateTransaction";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { formatApiDate } from "@/lib/formatters";
+import { showSuccessToast } from "@/lib/toast";
 import { Trash2Icon } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import z from "zod";
+import { useAppContext } from "@/contexts/app-context";
 
 export const Route = createFileRoute(
   "/_authed/dashboard/transactions/$transactionId/_layout/"
@@ -37,24 +37,22 @@ export const Route = createFileRoute(
     );
   },
   loader: async ({ params }) => {
-    const [categories, transaction] = await Promise.all([
-      getCategories(),
-      getTransaction({
-        data: {
-          transactionId: Number(params.transactionId),
-        },
-      }),
-    ]);
+    const transaction = await getTransaction({
+      data: {
+        transactionId: Number(params.transactionId),
+      },
+    });
     if (!transaction) {
       throw new Error("Transaction not found");
     }
-    return { categories, transaction };
+    return { transaction };
   },
 });
 
 function RouteComponent() {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { categories, transaction } = Route.useLoaderData();
+  const { transaction } = Route.useLoaderData();
+  const { categories } = useAppContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (data: z.infer<typeof transactionFormSchema>) => {
@@ -62,16 +60,13 @@ function RouteComponent() {
       data: {
         id: transaction.id,
         amount: data.amount,
-        transactionDate: format(data.transactionDate, "yyyy-MM-dd"),
+        transactionDate: formatApiDate(data.transactionDate),
         categoryId: data.categoryId,
         description: data.description,
       },
     });
 
-    toast.success("Success!", {
-      description: "Transaction updated successfully",
-      className: "bg-green-500 text-white",
-    });
+    showSuccessToast("Success!", "Transaction updated successfully");
     navigate({
       to: "/dashboard/transactions",
       search: {
@@ -88,10 +83,7 @@ function RouteComponent() {
         transactionId: Number(transaction.id),
       },
     });
-    toast.success("Success!", {
-      description: "Transaction deleted successfully",
-      className: "bg-green-500 text-white",
-    });
+    showSuccessToast("Success!", "Transaction deleted successfully");
     setIsDeleting(false);
 
     const date = new Date(transaction.transactionDate);
@@ -149,7 +141,6 @@ function RouteComponent() {
                 (category) => category.id === transaction.categoryId
               )?.type ?? "income",
           }}
-          categories={categories}
           onSubmit={handleSubmit}
         />
       </CardContent>

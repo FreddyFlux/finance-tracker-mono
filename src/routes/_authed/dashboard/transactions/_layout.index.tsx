@@ -1,31 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import z from "zod";
 import { AllTransactions } from "./-all-transactions";
-import { getTransactionYearsRange } from "@/data/getTransactionYearsRange";
 import { getTransactionsByMonth } from "@/data/getTransactionsByMonth";
-
-const today = new Date();
-
-const searchSchema = z.object({
-  month: z
-    .number()
-    .min(1)
-    .max(12)
-    .catch(today.getMonth() + 1)
-    .optional(),
-  year: z
-    .number()
-    .min(today.getFullYear() - 100)
-    .max(today.getFullYear())
-    .catch(today.getFullYear())
-    .optional(),
-});
+import {
+  transactionsSearchSchema,
+  getCurrentMonth,
+  getCurrentYear,
+} from "@/lib/validation";
 
 export const Route = createFileRoute(
   "/_authed/dashboard/transactions/_layout/"
 )({
   component: RouteComponent,
-  validateSearch: searchSchema,
+  validateSearch: transactionsSearchSchema,
   loaderDeps: ({ search }) => {
     return {
       month: search.month,
@@ -34,31 +20,30 @@ export const Route = createFileRoute(
   },
   // Cannot destructure params from loader, so we need to use the loaderDeps
   loader: async ({ deps }) => {
-    const yearsRange = await getTransactionYearsRange();
+    const currentMonth = getCurrentMonth();
+    const currentYear = getCurrentYear();
     const transactions = await getTransactionsByMonth({
       data: {
-        month: deps.month ?? today.getMonth() + 1,
-        year: deps.year ?? today.getFullYear(),
+        month: deps.month ?? currentMonth,
+        year: deps.year ?? currentYear,
       },
     });
     return {
-      month: deps.month ?? today.getMonth() + 1,
-      year: deps.year ?? today.getFullYear(),
-      yearsRange,
+      month: deps.month ?? currentMonth,
+      year: deps.year ?? currentYear,
       transactions,
     };
   },
 });
 
 function RouteComponent() {
-  const { month, year, yearsRange, transactions } = Route.useLoaderData();
+  const { month, year, transactions } = Route.useLoaderData();
 
   return (
     <AllTransactions
       transactions={transactions}
       month={month}
       year={year}
-      yearsRange={yearsRange}
     />
   );
 }

@@ -1,8 +1,15 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addDays, format } from "date-fns";
+import { formatDisplayDate } from "@/lib/formatters";
 import { useEffect } from "react";
+import {
+  transactionDateSchema,
+  amountSchema,
+  descriptionSchema,
+  categoryIdSchema,
+} from "@/lib/validation";
+import { sanitizeDescription } from "@/lib/sanitize";
 
 import {
   Form,
@@ -24,29 +31,22 @@ import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { Input } from "./ui/input";
-import { categoriesTable } from "@/db/schema";
+import { useAppContext } from "@/contexts/app-context";
 
 export const transactionFormSchema = z.object({
   transactionType: z.enum(["income", "expense"]),
-  categoryId: z.coerce.number().positive("Please select a category"),
-  transactionDate: z
-    .date()
-    .max(addDays(new Date(), 1), "Transaction date cannot be in the future"),
-  amount: z.coerce.number().positive("Amount must be greater than 0"),
-  description: z
-    .string()
-    .min(3, "Description must be at least 3 characters")
-    .max(300, "Description must be less than 300 characters"),
+  categoryId: categoryIdSchema,
+  transactionDate: transactionDateSchema,
+  amount: amountSchema,
+  description: descriptionSchema.transform(sanitizeDescription),
 });
 
 type TransactionFormData = z.infer<typeof transactionFormSchema>;
 
 export function TransactionForm({
-  categories,
   onSubmit,
   defaultValues,
 }: {
-  categories: (typeof categoriesTable.$inferSelect)[];
   onSubmit: (data: TransactionFormData) => Promise<void>;
   defaultValues?: {
     transactionType: "income" | "expense";
@@ -56,6 +56,7 @@ export function TransactionForm({
     description: string;
   };
 }) {
+  const { categories, isLoading } = useAppContext();
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(transactionFormSchema) as any,
     mode: "onSubmit",
@@ -71,9 +72,9 @@ export function TransactionForm({
 
   const transactionType = form.watch("transactionType");
 
-  const filteredCategories = categories.filter(
-    (cat) => cat.type === transactionType
-  );
+  const filteredCategories = isLoading
+    ? []
+    : categories.filter((cat) => cat.type === transactionType);
 
   // Reset categoryId when transaction type changes (but not on initial mount)
   useEffect(() => {
@@ -175,7 +176,7 @@ export function TransactionForm({
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {field.value
-                            ? format(field.value, "do MMM yyyy")
+                            ? formatDisplayDate(field.value)
                             : "Select date"}
                         </Button>
                       </PopoverTrigger>

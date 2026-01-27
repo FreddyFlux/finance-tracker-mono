@@ -1,90 +1,37 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { Link, useRouter } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { TransactionTable } from "@/components/transaction-table";
+import { EmptyState } from "@/components/empty-state";
+import { MonthYearSelector } from "@/components/month-year-selector";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import numeral from "numeral";
-import { PencilIcon } from "lucide-react";
+import { formatMonthYear } from "@/lib/formatters";
+import { Transaction } from "@/lib/types";
 
 export function AllTransactions({
   month,
   year,
-  yearsRange,
   transactions,
 }: {
   month: number;
   year: number;
-  yearsRange: number[];
-  transactions: Array<{
-    id: number;
-    description: string;
-    amount: string;
-    category: string | null;
-    transactionType: "income" | "expense" | null;
-    transactionDate: string;
-  }>;
+  transactions: Transaction[];
 }) {
-  const router = useRouter();
   const [selectedYear, setSelectedYear] = useState(year);
   const [selectedMonth, setSelectedMonth] = useState(month);
-
-  const selectedDate = new Date(year, month - 1);
 
   return (
     <Card className="mt-4">
       <CardHeader>
         <CardTitle className="flex justify-between">
-          <span>
-            Transactions for {format(new Date(year, month - 1), "MMM yyyy")}
-          </span>
+          <span>Transactions for {formatMonthYear(month, year)}</span>
           <div className="flex gap-1">
-            <Select
-              value={selectedMonth.toString()}
-              onValueChange={(value) => setSelectedMonth(Number(value))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => (
-                  <SelectItem key={i} value={`${i + 1}`}>
-                    {format(new Date(selectedDate.getFullYear(), i, 1), "MMM")}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={selectedYear.toString()}
-              onValueChange={(value) => setSelectedYear(Number(value))}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {yearsRange.map((year) => (
-                  <SelectItem value={year.toString()} key={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <MonthYearSelector
+              year={selectedYear}
+              month={selectedMonth}
+              onMonthChange={setSelectedMonth}
+              onYearChange={setSelectedYear}
+            />
             <Button asChild>
               <Link
                 to="/dashboard/transactions"
@@ -100,70 +47,10 @@ export function AllTransactions({
         <Button asChild>
           <Link to="/dashboard/transactions/new">New Transaction</Link>
         </Button>
-        {!transactions.length && (
-          <p className="text-center py-10 text-lg text-muted-foreground">
-            No transactions for this month
-          </p>
-        )}
-        {!!transactions.length && (
-          <Table className="mt-4">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>
-                    {format(transaction.transactionDate, "do MMM yyyy")}
-                  </TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell className="capitalize">
-                    <Badge
-                      className={
-                        transaction.transactionType === "income"
-                          ? "bg-lime-500"
-                          : "bg-rose-500"
-                      }
-                    >
-                      {transaction.transactionType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell>
-                    € {numeral(transaction.amount).format("0,0[.]00")}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      aria-label="Edit Transaction"
-                      asChild
-                    >
-                      <Link
-                        onClick={() => {
-                          router.clearCache({
-                            filter: (route) =>
-                              route.pathname !==
-                              `/dashboard/transactions/${transaction.id}`,
-                          });
-                        }}
-                        to="/dashboard/transactions/$transactionId"
-                        params={{ transactionId: transaction.id.toString() }}
-                      >
-                        <PencilIcon />
-                      </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        {!transactions.length ? (
+          <EmptyState message="No transactions for this month" />
+        ) : (
+          <TransactionTable transactions={transactions} showEditButton />
         )}
       </CardContent>
     </Card>

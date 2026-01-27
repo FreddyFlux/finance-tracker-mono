@@ -1,29 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format } from "date-fns";
-import numeral from "numeral";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import { TransactionTable } from "@/components/transaction-table";
+import { EmptyState } from "@/components/empty-state";
+import { Transaction } from "@/lib/types";
 
 export function RecentTransactions({
   transactions,
 }: {
-  transactions: Array<{
-    id: number;
-    description: string;
-    amount: string;
-    category: string | null;
-    transactionType: "income" | "expense" | null;
-    transactionDate: string;
-  }>;
+  transactions: Transaction[];
 }) {
   return (
     <Card>
@@ -41,49 +26,10 @@ export function RecentTransactions({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {" "}
-        {!transactions.length && (
-          <p className="text-center py-10 text-lg text-muted-foreground">
-            No transactions for this month
-          </p>
-        )}
-        {!!transactions.length && (
-          <Table className="mt-4">
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.id}>
-                  <TableCell>
-                    {format(transaction.transactionDate, "do MMM yyyy")}
-                  </TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell className="capitalize">
-                    <Badge
-                      className={
-                        transaction.transactionType === "income"
-                          ? "bg-lime-500"
-                          : "bg-rose-500"
-                      }
-                    >
-                      {transaction.transactionType}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell>
-                    € {numeral(transaction.amount).format("0,0[.]00")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        {!transactions.length ? (
+          <EmptyState message="No transactions for this month" />
+        ) : (
+          <TransactionTable transactions={transactions} />
         )}
       </CardContent>
     </Card>

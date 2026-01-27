@@ -4,9 +4,10 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
+import { transactionIdSchema } from "@/lib/validation";
 
 const schema = z.object({
-  transactionId: z.number(),
+  transactionId: transactionIdSchema,
 });
 
 export const getTransaction = createServerFn({

@@ -4,32 +4,21 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
+import { YearSelector } from "@/components/year-selector";
 import { useNavigate } from "@tanstack/react-router";
-import { format } from "date-fns";
+import { formatMonth, formatFullMonth, formatCurrencyChart } from "@/lib/formatters";
 import numeral from "numeral";
 import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
+import { MonthlyCashflow } from "@/lib/types";
+import { formatCurrency } from "@/lib/formatters";
 
 export function Cashflow({
-  yearsRange,
   year,
   annualCashflow,
 }: {
-  yearsRange: number[];
   year: number;
-  annualCashflow: {
-    month: number;
-    income: number;
-    expense: number;
-  }[];
+  annualCashflow: MonthlyCashflow[];
 }) {
   const totalAnnualIncome = annualCashflow.reduce(
     (prevResult: number, { income }) => {
@@ -51,28 +40,17 @@ export function Cashflow({
       <CardHeader className="flex justify-between">
         <span>Cashflow</span>
         <div>
-          <Select
-            defaultValue={year.toString()}
-            onValueChange={(value) => {
+          <YearSelector
+            value={year}
+            onValueChange={(selectedYear) => {
               navigate({
                 to: "/dashboard",
                 search: {
-                  cfyear: Number(value),
+                  cfyear: selectedYear,
                 },
               });
             }}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {yearsRange.map((year) => (
-                <SelectItem key={year.toString()} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
       </CardHeader>
       <CardContent className="grid grid-cols-[1fr_250px]">
@@ -91,34 +69,28 @@ export function Cashflow({
         >
           <BarChart data={annualCashflow}>
             <CartesianGrid vertical={false} />
-            <YAxis
-              tickFormatter={(value) => {
-                return `€${numeral(value).format("0,0")}  `;
-              }}
-            />
+            <YAxis tickFormatter={formatCurrencyChart} />
             <XAxis
               dataKey="month"
-              tickFormatter={(value) => {
-                return format(new Date(year, value - 1, 1), "MMM");
-              }}
+              tickFormatter={(value) => formatMonth(value, year)}
             />
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  formatter={(value, name, props) => {
+                  formatter={(value, name) => {
                     return (
                       <div>
-                        {name === "income" ? "Income" : "Expenses"}: €{" "}
-                        {numeral(value).format("0,0")}
+                        {name === "income" ? "Income" : "Expenses"}:{" "}
+                        {formatCurrency(Number(value))}
                       </div>
                     );
                   }}
                   labelFormatter={(value, payload) => {
                     return (
                       <div>
-                        {format(
-                          new Date(year, payload[0]?.payload?.month - 1, 1),
-                          "MMMM"
+                        {formatFullMonth(
+                          payload[0]?.payload?.month ?? 1,
+                          year
                         )}
                       </div>
                     );
@@ -135,7 +107,7 @@ export function Cashflow({
           <span className="text-m text-muted-foreground">Income</span>
 
           <h2 className="text-3xl font-semibold">
-            € {numeral(totalAnnualIncome).format("0,0")}
+            {formatCurrency(totalAnnualIncome)}
           </h2>
 
           <div className="h-px bg-border w-full" />
@@ -143,7 +115,7 @@ export function Cashflow({
           <span className="text-m text-muted-foreground">Expenses</span>
 
           <h2 className="text-3xl font-semibold">
-            € {numeral(totalAnnualExpense).format("0,0")}
+            {formatCurrency(totalAnnualExpense)}
           </h2>
 
           <div className="h-px bg-border w-full" />
@@ -156,7 +128,7 @@ export function Cashflow({
               balance > 0 ? "text-green-500" : "text-orange-500"
             )}
           >
-            € {numeral(balance).format("0,0")}
+            {formatCurrency(balance)}
           </h2>
         </div>
       </CardContent>

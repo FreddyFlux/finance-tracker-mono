@@ -5,15 +5,15 @@ import { format } from "date-fns";
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-
-const today = new Date();
+import { TRANSACTION_LIMITS } from "@/lib/constants";
+import { getCurrentYear } from "@/lib/validation";
 
 const schema = z.object({
   month: z.number().min(1).max(12),
   year: z
     .number()
-    .min(today.getFullYear() - 100)
-    .max(today.getFullYear()),
+    .min(getCurrentYear() - TRANSACTION_LIMITS.YEAR_RANGE_OFFSET)
+    .max(getCurrentYear()),
 });
 
 export const getTransactionsByMonth = createServerFn({
