@@ -8,7 +8,7 @@ import db from '@/db'
 import { userConnectionsTable } from '@/db/schema'
 import { connectionRequestSchema } from '@/lib/validation'
 
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! })
 
 export const Route = createAPIFileRoute('/api/connections')({
 	GET: async () => {

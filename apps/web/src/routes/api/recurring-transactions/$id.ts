@@ -16,10 +16,6 @@ const updateRecurringTransactionSchema = recurringTransactionSchema.extend({
 	id: recurringTransactionIdSchema,
 })
 
-const toggleRecurringTransactionSchema = z.object({
-	action: z.enum(['toggle']),
-})
-
 export const Route = createAPIFileRoute('/api/recurring-transactions/$id')({
 	PUT: async ({ params, request }) => {
 		try {
@@ -110,6 +106,38 @@ export const Route = createAPIFileRoute('/api/recurring-transactions/$id')({
 				return json({ error: 'Invalid recurring transaction ID' }, { status: 400 })
 			}
 			console.error('Error deleting recurring transaction:', error)
+			return json({ error: 'Internal server error' }, { status: 500 })
+		}
+	},
+	PATCH: async ({ params }) => {
+		try {
+			const { userId } = await auth()
+			if (!userId) return json({ error: 'Unauthorized' }, { status: 401 })
+
+			const id = recurringTransactionIdSchema.parse(Number(params.id))
+
+			const [current] = await db
+				.select({ isActive: recurringTransactionsTable.isActive })
+				.from(recurringTransactionsTable)
+				.where(and(
+					eq(recurringTransactionsTable.id, id),
+					eq(recurringTransactionsTable.userId, userId),
+				))
+
+			if (!current) return json({ error: 'Recurring transaction not found' }, { status: 404 })
+
+			const [updated] = await db
+				.update(recurringTransactionsTable)
+				.set({ isActive: !current.isActive, updatedAt: new Date() })
+				.where(and(
+					eq(recurringTransactionsTable.id, id),
+					eq(recurringTransactionsTable.userId, userId),
+				))
+				.returning()
+
+			return json(updated)
+		} catch (error) {
+			console.error('Error toggling recurring transaction:', error)
 			return json({ error: 'Internal server error' }, { status: 500 })
 		}
 	},

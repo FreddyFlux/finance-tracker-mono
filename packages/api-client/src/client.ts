@@ -2,8 +2,9 @@ const getBaseUrl = () => {
 	if (process.env.EXPO_PUBLIC_API_URL) {
 		return process.env.EXPO_PUBLIC_API_URL
 	}
-	// Android emulator needs 10.0.2.2 to reach host machine
-	// iOS simulator can use localhost
+	// NOTE: localhost:3000 works for iOS simulator only.
+	// For Android emulator use your Mac's local IP e.g. http://192.168.x.x:3000
+	// Always set EXPO_PUBLIC_API_URL in apps/mobile/.env for local dev
 	return 'http://localhost:3000'
 }
 
