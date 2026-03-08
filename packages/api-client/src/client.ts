@@ -1,7 +1,10 @@
 const getBaseUrl = () => {
-	// EXPO_PUBLIC_API_URL is set in apps/mobile/.env
-	// Falls back to localhost for local dev
-	return process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000'
+	if (process.env.EXPO_PUBLIC_API_URL) {
+		return process.env.EXPO_PUBLIC_API_URL
+	}
+	// Android emulator needs 10.0.2.2 to reach host machine
+	// iOS simulator can use localhost
+	return 'http://localhost:3000'
 }
 
 export async function apiRequest<T>(

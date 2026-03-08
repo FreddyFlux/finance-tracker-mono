@@ -2,9 +2,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, or } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { createClerkClient } from "@clerk/backend";
 import db from "@/db";
 import { userConnectionsTable } from "@/db/schema";
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 const schema = z.object({
 	recipientEmail: z.string().email("Please enter a valid email address"),

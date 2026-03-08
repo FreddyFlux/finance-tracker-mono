@@ -2,11 +2,13 @@ import { json } from '@tanstack/react-start'
 import { createAPIFileRoute } from '@tanstack/react-start/api'
 import { auth } from '@clerk/tanstack-react-start/server'
 import { and, eq, or } from 'drizzle-orm'
-import { clerkClient } from '@clerk/clerk-sdk-node'
+import { createClerkClient } from '@clerk/backend'
 import z from 'zod'
 import db from '@/db'
 import { userConnectionsTable } from '@/db/schema'
 import { connectionRequestSchema } from '@/lib/validation'
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY })
 
 export const Route = createAPIFileRoute('/api/connections')({
 	GET: async () => {

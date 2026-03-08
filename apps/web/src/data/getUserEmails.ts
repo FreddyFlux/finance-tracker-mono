@@ -1,7 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import authMiddleware from "middlewares/authMiddleware";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { createClerkClient } from "@clerk/backend";
 import z from "zod";
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 const schema = z.object({
 	userIds: z.array(z.string()),

@@ -1,9 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq, or } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
-import { clerkClient } from "@clerk/clerk-sdk-node";
+import { createClerkClient } from "@clerk/backend";
 import db from "@/db";
 import { userConnectionsTable } from "@/db/schema";
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 
 async function getUserEmail(userId: string): Promise<string> {
 	try {
