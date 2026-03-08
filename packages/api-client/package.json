@@ -1,0 +1,13 @@
+{
+  "name": "@money-saver/api-client",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@tanstack/react-query": "^5.0.0",
+    "@money-saver/validations": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
