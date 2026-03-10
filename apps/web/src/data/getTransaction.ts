@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-import db from "@/db";
-import { transactionsTable } from "@/db/schema";
+import db, { transactionsTable } from "@money-saver/db";
+import { canViewUserTransactions } from "@/lib/connection-helpers";
 import { transactionIdSchema } from "@/lib/validation";
 
 const schema = z.object({
@@ -19,11 +19,22 @@ export const getTransaction = createServerFn({
 		const [transaction] = await db
 			.select()
 			.from(transactionsTable)
-			.where(
-				and(
-					eq(transactionsTable.id, data.transactionId),
-					eq(transactionsTable.userId, context.userId),
-				),
-			);
-		return transaction;
+			.where(eq(transactionsTable.id, data.transactionId));
+
+		if (!transaction) {
+			return null;
+		}
+
+		const canView = await canViewUserTransactions(
+			context.userId,
+			transaction.userId,
+		);
+		if (!canView) {
+			return null;
+		}
+
+		return {
+			transaction,
+			canEdit: transaction.userId === context.userId,
+		};
 	});

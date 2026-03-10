@@ -1,16 +1,18 @@
-import { json } from '@tanstack/react-start'
-import { createAPIFileRoute } from '@tanstack/react-start/api'
-import db from '@/db'
-import { categoriesTable } from '@/db/schema'
+import { createFileRoute } from '@tanstack/react-router'
+import db, { categoriesTable } from '@money-saver/db'
 
-export const Route = createAPIFileRoute('/api/categories')({
-	GET: async () => {
-		try {
-			const categories = await db.select().from(categoriesTable)
-			return json(categories)
-		} catch (error) {
-			console.error('Error fetching categories:', error)
-			return json({ error: 'Internal server error' }, { status: 500 })
-		}
+export const Route = createFileRoute('/api/categories/')({
+	server: {
+		handlers: {
+			GET: async () => {
+				try {
+					const categories = await db.select().from(categoriesTable)
+					return Response.json(categories)
+				} catch (error) {
+					console.error('Error fetching categories:', error)
+					return Response.json({ error: 'Internal server error' }, { status: 500 })
+				}
+			},
+		},
 	},
 })

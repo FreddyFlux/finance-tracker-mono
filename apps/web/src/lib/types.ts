@@ -1,4 +1,4 @@
-import type { categoriesTable, recurringTransactionsTable } from "@/db/schema";
+import type { categoriesTable, recurringTransactionsTable } from "@money-saver/db";
 
 export type TransactionType = "income" | "expense";
 

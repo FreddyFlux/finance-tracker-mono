@@ -29,8 +29,8 @@ This is a **TanStack Start** (full-stack React framework) application for tracki
 - Server functions follow naming: `get*`, `create*`, `update*`, `delete*`
 
 ### 3. Data Layer Architecture
-- **Database**: Drizzle ORM with PostgreSQL schema in `src/db/schema.ts`
-- **Connection**: Single `db` export from `src/db/index.ts` using Neon serverless
+- **Database**: Drizzle ORM with PostgreSQL schema in `packages/db` (`@money-saver/db`)
+- **Connection**: Import `db` and schema tables from `@money-saver/db`
 - **Queries**: Use Drizzle query builder with proper type inference
 - **Validation**: All inputs validated with Zod schemas before database operations
 - **Sanitization**: User inputs sanitized using `src/lib/sanitize.ts` functions
@@ -154,7 +154,7 @@ export const getData = createServerFn({
 ### Database Patterns
 
 #### Schema Definition
-- Use Drizzle ORM table definitions in `src/db/schema.ts`
+- Use Drizzle ORM table definitions from `@money-saver/db` (schema in `packages/db/src/schema.ts`)
 - Use `pgTable()` for PostgreSQL tables
 - Use proper types: `text()`, `integer()`, `numeric()`, `date()`
 - Use `.references()` for foreign keys
@@ -336,7 +336,7 @@ export const getData = createServerFn({
 
 ### Database Changes
 
-1. Update schema in `src/db/schema.ts`
+1. Update schema in `packages/db/src/schema.ts`
 2. Run migrations using Drizzle Kit
 3. Update types if needed
 4. Update server functions that use changed tables

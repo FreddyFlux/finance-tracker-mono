@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import type z from "zod";
-import db from "@/db";
-import { userConnectionsTable } from "@/db/schema";
+import db, { userConnectionsTable } from "@money-saver/db";
 import { connectionResponseSchema } from "@/lib/validation";
 
 const schema = connectionResponseSchema;

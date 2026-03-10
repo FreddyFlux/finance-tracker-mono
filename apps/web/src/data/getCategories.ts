@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import db from "@/db";
-import { categoriesTable } from "@/db/schema";
+import db, { categoriesTable } from "@money-saver/db";
 
 export const getCategories = createServerFn({
 	method: "GET",

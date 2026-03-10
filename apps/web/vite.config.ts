@@ -20,7 +20,7 @@ const config = defineConfig({
   server: {
     hmr: {
       overlay: true,
-      clientPort: 3000,
+      // Don't fix clientPort - let Vite use the actual server port for WebSocket
     },
     watch: {
       usePolling: false,

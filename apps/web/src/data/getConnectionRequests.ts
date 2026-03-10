@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq, or } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import { createClerkClient } from "@clerk/backend";
-import db from "@/db";
-import { userConnectionsTable } from "@/db/schema";
+import db, { userConnectionsTable } from "@money-saver/db";
 
 const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
 

@@ -1,7 +1,6 @@
 import { addMonths, addYears } from "date-fns";
 import { and, eq, gte, isNull, lte, or } from "drizzle-orm";
-import db from "@/db";
-import { recurringTransactionsTable, transactionsTable } from "@/db/schema";
+import db, { recurringTransactionsTable, transactionsTable } from "@money-saver/db";
 import { formatApiDate } from "@/lib/formatters";
 
 /**

@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import authMiddleware from "middlewares/authMiddleware";
 import type z from "zod";
-import db from "@/db";
-import { recurringTransactionsTable } from "@/db/schema";
+import db, { recurringTransactionsTable } from "@money-saver/db";
 import { getCurrentYear, recurringTransactionSchema } from "@/lib/validation";
 import { generateRecurringTransactionsForYear } from "./generateRecurringTransactions";
 

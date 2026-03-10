@@ -1,6 +1,5 @@
 import { and, eq, or } from "drizzle-orm";
-import db from "@/db";
-import { userConnectionsTable } from "@/db/schema";
+import db, { userConnectionsTable } from "@money-saver/db";
 
 /**
  * Verify if a user has permission to view another user's transactions

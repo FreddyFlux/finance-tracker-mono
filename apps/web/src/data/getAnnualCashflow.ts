@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-import db from "@/db";
-import { categoriesTable, transactionsTable } from "@/db/schema";
+import db, { categoriesTable, transactionsTable } from "@money-saver/db";
 import { canViewUserTransactions } from "@/lib/connection-helpers";
 import { generateRecurringTransactionsForYear } from "./generateRecurringTransactions";
 

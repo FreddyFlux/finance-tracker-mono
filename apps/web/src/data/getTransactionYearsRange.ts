@@ -1,8 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { asc, eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
-import db from "@/db";
-import { transactionsTable } from "@/db/schema";
+import db, { transactionsTable } from "@money-saver/db";
 
 export const getTransactionYearsRange = createServerFn({
 	method: "GET",

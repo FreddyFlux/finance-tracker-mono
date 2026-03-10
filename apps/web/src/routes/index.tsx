@@ -7,7 +7,6 @@ import {
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChartColumnBigIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import cover from "../../public/save-money.jpg";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -15,7 +14,7 @@ function App() {
   return (
     <div className="min-h-[400px] h-[calc(100vh-80px)] flex items-center justify-center relative">
       <img
-        src={cover}
+        src="/save-money.jpg"
         className="absolute top-0 left-0 size-full object-cover object-center opacity-40"
         alt="Cover"
       />

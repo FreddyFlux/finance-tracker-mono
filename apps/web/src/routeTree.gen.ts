@@ -11,7 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthedRouteImport } from './routes/_authed'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTransactionsIndexRouteImport } from './routes/api/transactions/index'
+import { Route as ApiRecurringTransactionsIndexRouteImport } from './routes/api/recurring-transactions/index'
+import { Route as ApiConnectionsIndexRouteImport } from './routes/api/connections/index'
+import { Route as ApiCategoriesIndexRouteImport } from './routes/api/categories/index'
+import { Route as ApiCashflowIndexRouteImport } from './routes/api/cashflow/index'
 import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashboard/index'
+import { Route as ApiTransactionsYearsRangeRouteImport } from './routes/api/transactions/years-range'
+import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions/$id'
+import { Route as ApiRecurringTransactionsIdRouteImport } from './routes/api/recurring-transactions/$id'
+import { Route as ApiConnectionsIdRouteImport } from './routes/api/connections/$id'
+import { Route as ApiConnectionsRequestsIndexRouteImport } from './routes/api/connections/requests/index'
+import { Route as ApiRecurringTransactionsIdToggleRouteImport } from './routes/api/recurring-transactions/$id/toggle'
 import { Route as AuthedDashboardTransactionsLayoutRouteImport } from './routes/_authed/dashboard/transactions/_layout'
 import { Route as AuthedDashboardConnectionsLayoutRouteImport } from './routes/_authed/dashboard/connections/_layout'
 import { Route as AuthedDashboardTransactionsLayoutIndexRouteImport } from './routes/_authed/dashboard/transactions/_layout.index'
@@ -30,11 +41,71 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTransactionsIndexRoute = ApiTransactionsIndexRouteImport.update({
+  id: '/api/transactions/',
+  path: '/api/transactions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRecurringTransactionsIndexRoute =
+  ApiRecurringTransactionsIndexRouteImport.update({
+    id: '/api/recurring-transactions/',
+    path: '/api/recurring-transactions/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiConnectionsIndexRoute = ApiConnectionsIndexRouteImport.update({
+  id: '/api/connections/',
+  path: '/api/connections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCategoriesIndexRoute = ApiCategoriesIndexRouteImport.update({
+  id: '/api/categories/',
+  path: '/api/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCashflowIndexRoute = ApiCashflowIndexRouteImport.update({
+  id: '/api/cashflow/',
+  path: '/api/cashflow/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthedDashboardIndexRoute = AuthedDashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
   getParentRoute: () => AuthedRoute,
 } as any)
+const ApiTransactionsYearsRangeRoute =
+  ApiTransactionsYearsRangeRouteImport.update({
+    id: '/api/transactions/years-range',
+    path: '/api/transactions/years-range',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiTransactionsIdRoute = ApiTransactionsIdRouteImport.update({
+  id: '/api/transactions/$id',
+  path: '/api/transactions/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRecurringTransactionsIdRoute =
+  ApiRecurringTransactionsIdRouteImport.update({
+    id: '/api/recurring-transactions/$id',
+    path: '/api/recurring-transactions/$id',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiConnectionsIdRoute = ApiConnectionsIdRouteImport.update({
+  id: '/api/connections/$id',
+  path: '/api/connections/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiConnectionsRequestsIndexRoute =
+  ApiConnectionsRequestsIndexRouteImport.update({
+    id: '/api/connections/requests/',
+    path: '/api/connections/requests/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiRecurringTransactionsIdToggleRoute =
+  ApiRecurringTransactionsIdToggleRouteImport.update({
+    id: '/toggle',
+    path: '/toggle',
+    getParentRoute: () => ApiRecurringTransactionsIdRoute,
+  } as any)
 const AuthedDashboardTransactionsLayoutRoute =
   AuthedDashboardTransactionsLayoutRouteImport.update({
     id: '/dashboard/transactions/_layout',
@@ -86,9 +157,20 @@ const AuthedDashboardTransactionsTransactionIdLayoutIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
+  '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
   '/dashboard/': typeof AuthedDashboardIndexRoute
+  '/api/cashflow/': typeof ApiCashflowIndexRoute
+  '/api/categories/': typeof ApiCategoriesIndexRoute
+  '/api/connections/': typeof ApiConnectionsIndexRoute
+  '/api/recurring-transactions/': typeof ApiRecurringTransactionsIndexRoute
+  '/api/transactions/': typeof ApiTransactionsIndexRoute
   '/dashboard/connections': typeof AuthedDashboardConnectionsLayoutRouteWithChildren
   '/dashboard/transactions': typeof AuthedDashboardTransactionsLayoutRouteWithChildren
+  '/api/recurring-transactions/$id/toggle': typeof ApiRecurringTransactionsIdToggleRoute
+  '/api/connections/requests/': typeof ApiConnectionsRequestsIndexRoute
   '/dashboard/transactions/$transactionId': typeof AuthedDashboardTransactionsTransactionIdLayoutRouteWithChildren
   '/dashboard/transactions/new': typeof AuthedDashboardTransactionsNewLayoutRouteWithChildren
   '/dashboard/connections/': typeof AuthedDashboardConnectionsLayoutIndexRoute
@@ -98,7 +180,18 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
+  '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
   '/dashboard': typeof AuthedDashboardIndexRoute
+  '/api/cashflow': typeof ApiCashflowIndexRoute
+  '/api/categories': typeof ApiCategoriesIndexRoute
+  '/api/connections': typeof ApiConnectionsIndexRoute
+  '/api/recurring-transactions': typeof ApiRecurringTransactionsIndexRoute
+  '/api/transactions': typeof ApiTransactionsIndexRoute
+  '/api/recurring-transactions/$id/toggle': typeof ApiRecurringTransactionsIdToggleRoute
+  '/api/connections/requests': typeof ApiConnectionsRequestsIndexRoute
   '/dashboard/connections': typeof AuthedDashboardConnectionsLayoutIndexRoute
   '/dashboard/transactions': typeof AuthedDashboardTransactionsLayoutIndexRoute
   '/dashboard/transactions/$transactionId': typeof AuthedDashboardTransactionsTransactionIdLayoutIndexRoute
@@ -108,9 +201,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
+  '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
+  '/api/transactions/$id': typeof ApiTransactionsIdRoute
+  '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
   '/_authed/dashboard/': typeof AuthedDashboardIndexRoute
+  '/api/cashflow/': typeof ApiCashflowIndexRoute
+  '/api/categories/': typeof ApiCategoriesIndexRoute
+  '/api/connections/': typeof ApiConnectionsIndexRoute
+  '/api/recurring-transactions/': typeof ApiRecurringTransactionsIndexRoute
+  '/api/transactions/': typeof ApiTransactionsIndexRoute
   '/_authed/dashboard/connections/_layout': typeof AuthedDashboardConnectionsLayoutRouteWithChildren
   '/_authed/dashboard/transactions/_layout': typeof AuthedDashboardTransactionsLayoutRouteWithChildren
+  '/api/recurring-transactions/$id/toggle': typeof ApiRecurringTransactionsIdToggleRoute
+  '/api/connections/requests/': typeof ApiConnectionsRequestsIndexRoute
   '/_authed/dashboard/transactions/$transactionId/_layout': typeof AuthedDashboardTransactionsTransactionIdLayoutRouteWithChildren
   '/_authed/dashboard/transactions/new/_layout': typeof AuthedDashboardTransactionsNewLayoutRouteWithChildren
   '/_authed/dashboard/connections/_layout/': typeof AuthedDashboardConnectionsLayoutIndexRoute
@@ -122,9 +226,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/api/connections/$id'
+    | '/api/recurring-transactions/$id'
+    | '/api/transactions/$id'
+    | '/api/transactions/years-range'
     | '/dashboard/'
+    | '/api/cashflow/'
+    | '/api/categories/'
+    | '/api/connections/'
+    | '/api/recurring-transactions/'
+    | '/api/transactions/'
     | '/dashboard/connections'
     | '/dashboard/transactions'
+    | '/api/recurring-transactions/$id/toggle'
+    | '/api/connections/requests/'
     | '/dashboard/transactions/$transactionId'
     | '/dashboard/transactions/new'
     | '/dashboard/connections/'
@@ -134,7 +249,18 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/connections/$id'
+    | '/api/recurring-transactions/$id'
+    | '/api/transactions/$id'
+    | '/api/transactions/years-range'
     | '/dashboard'
+    | '/api/cashflow'
+    | '/api/categories'
+    | '/api/connections'
+    | '/api/recurring-transactions'
+    | '/api/transactions'
+    | '/api/recurring-transactions/$id/toggle'
+    | '/api/connections/requests'
     | '/dashboard/connections'
     | '/dashboard/transactions'
     | '/dashboard/transactions/$transactionId'
@@ -143,9 +269,20 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authed'
+    | '/api/connections/$id'
+    | '/api/recurring-transactions/$id'
+    | '/api/transactions/$id'
+    | '/api/transactions/years-range'
     | '/_authed/dashboard/'
+    | '/api/cashflow/'
+    | '/api/categories/'
+    | '/api/connections/'
+    | '/api/recurring-transactions/'
+    | '/api/transactions/'
     | '/_authed/dashboard/connections/_layout'
     | '/_authed/dashboard/transactions/_layout'
+    | '/api/recurring-transactions/$id/toggle'
+    | '/api/connections/requests/'
     | '/_authed/dashboard/transactions/$transactionId/_layout'
     | '/_authed/dashboard/transactions/new/_layout'
     | '/_authed/dashboard/connections/_layout/'
@@ -157,6 +294,16 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
+  ApiConnectionsIdRoute: typeof ApiConnectionsIdRoute
+  ApiRecurringTransactionsIdRoute: typeof ApiRecurringTransactionsIdRouteWithChildren
+  ApiTransactionsIdRoute: typeof ApiTransactionsIdRoute
+  ApiTransactionsYearsRangeRoute: typeof ApiTransactionsYearsRangeRoute
+  ApiCashflowIndexRoute: typeof ApiCashflowIndexRoute
+  ApiCategoriesIndexRoute: typeof ApiCategoriesIndexRoute
+  ApiConnectionsIndexRoute: typeof ApiConnectionsIndexRoute
+  ApiRecurringTransactionsIndexRoute: typeof ApiRecurringTransactionsIndexRoute
+  ApiTransactionsIndexRoute: typeof ApiTransactionsIndexRoute
+  ApiConnectionsRequestsIndexRoute: typeof ApiConnectionsRequestsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -175,12 +322,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/transactions/': {
+      id: '/api/transactions/'
+      path: '/api/transactions'
+      fullPath: '/api/transactions/'
+      preLoaderRoute: typeof ApiTransactionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/recurring-transactions/': {
+      id: '/api/recurring-transactions/'
+      path: '/api/recurring-transactions'
+      fullPath: '/api/recurring-transactions/'
+      preLoaderRoute: typeof ApiRecurringTransactionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/connections/': {
+      id: '/api/connections/'
+      path: '/api/connections'
+      fullPath: '/api/connections/'
+      preLoaderRoute: typeof ApiConnectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/categories/': {
+      id: '/api/categories/'
+      path: '/api/categories'
+      fullPath: '/api/categories/'
+      preLoaderRoute: typeof ApiCategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cashflow/': {
+      id: '/api/cashflow/'
+      path: '/api/cashflow'
+      fullPath: '/api/cashflow/'
+      preLoaderRoute: typeof ApiCashflowIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authed/dashboard/': {
       id: '/_authed/dashboard/'
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthedDashboardIndexRouteImport
       parentRoute: typeof AuthedRoute
+    }
+    '/api/transactions/years-range': {
+      id: '/api/transactions/years-range'
+      path: '/api/transactions/years-range'
+      fullPath: '/api/transactions/years-range'
+      preLoaderRoute: typeof ApiTransactionsYearsRangeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transactions/$id': {
+      id: '/api/transactions/$id'
+      path: '/api/transactions/$id'
+      fullPath: '/api/transactions/$id'
+      preLoaderRoute: typeof ApiTransactionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/recurring-transactions/$id': {
+      id: '/api/recurring-transactions/$id'
+      path: '/api/recurring-transactions/$id'
+      fullPath: '/api/recurring-transactions/$id'
+      preLoaderRoute: typeof ApiRecurringTransactionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/connections/$id': {
+      id: '/api/connections/$id'
+      path: '/api/connections/$id'
+      fullPath: '/api/connections/$id'
+      preLoaderRoute: typeof ApiConnectionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/connections/requests/': {
+      id: '/api/connections/requests/'
+      path: '/api/connections/requests'
+      fullPath: '/api/connections/requests/'
+      preLoaderRoute: typeof ApiConnectionsRequestsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/recurring-transactions/$id/toggle': {
+      id: '/api/recurring-transactions/$id/toggle'
+      path: '/toggle'
+      fullPath: '/api/recurring-transactions/$id/toggle'
+      preLoaderRoute: typeof ApiRecurringTransactionsIdToggleRouteImport
+      parentRoute: typeof ApiRecurringTransactionsIdRoute
     }
     '/_authed/dashboard/transactions/_layout': {
       id: '/_authed/dashboard/transactions/_layout'
@@ -324,9 +548,34 @@ const AuthedRouteChildren: AuthedRouteChildren = {
 const AuthedRouteWithChildren =
   AuthedRoute._addFileChildren(AuthedRouteChildren)
 
+interface ApiRecurringTransactionsIdRouteChildren {
+  ApiRecurringTransactionsIdToggleRoute: typeof ApiRecurringTransactionsIdToggleRoute
+}
+
+const ApiRecurringTransactionsIdRouteChildren: ApiRecurringTransactionsIdRouteChildren =
+  {
+    ApiRecurringTransactionsIdToggleRoute:
+      ApiRecurringTransactionsIdToggleRoute,
+  }
+
+const ApiRecurringTransactionsIdRouteWithChildren =
+  ApiRecurringTransactionsIdRoute._addFileChildren(
+    ApiRecurringTransactionsIdRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
+  ApiConnectionsIdRoute: ApiConnectionsIdRoute,
+  ApiRecurringTransactionsIdRoute: ApiRecurringTransactionsIdRouteWithChildren,
+  ApiTransactionsIdRoute: ApiTransactionsIdRoute,
+  ApiTransactionsYearsRangeRoute: ApiTransactionsYearsRangeRoute,
+  ApiCashflowIndexRoute: ApiCashflowIndexRoute,
+  ApiCategoriesIndexRoute: ApiCategoriesIndexRoute,
+  ApiConnectionsIndexRoute: ApiConnectionsIndexRoute,
+  ApiRecurringTransactionsIndexRoute: ApiRecurringTransactionsIndexRoute,
+  ApiTransactionsIndexRoute: ApiTransactionsIndexRoute,
+  ApiConnectionsRequestsIndexRoute: ApiConnectionsRequestsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

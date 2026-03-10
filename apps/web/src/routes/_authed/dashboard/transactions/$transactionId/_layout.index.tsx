@@ -22,7 +22,11 @@ import { useAppContext } from "@/contexts/app-context";
 import { deleteTransaction } from "@/data/deleteTransaction";
 import { getTransaction } from "@/data/getTransaction";
 import { updateTransaction } from "@/data/updateTransaction";
-import { formatApiDate } from "@/lib/formatters";
+import {
+	formatApiDate,
+	formatCurrency,
+	formatDisplayDate,
+} from "@/lib/formatters";
 import { showSuccessToast } from "@/lib/toast";
 
 export const Route = createFileRoute(
@@ -37,23 +41,26 @@ export const Route = createFileRoute(
 		);
 	},
 	loader: async ({ params }) => {
-		const transaction = await getTransaction({
+		const result = await getTransaction({
 			data: {
 				transactionId: Number(params.transactionId),
 			},
 		});
-		if (!transaction) {
+		if (!result) {
 			throw new Error("Transaction not found");
 		}
-		return { transaction };
+		return { transaction: result.transaction, canEdit: result.canEdit };
 	},
 });
 
 function RouteComponent() {
 	const [isDeleting, setIsDeleting] = useState(false);
-	const { transaction } = Route.useLoaderData();
+	const { transaction, canEdit } = Route.useLoaderData();
 	const { categories } = useAppContext();
 	const navigate = useNavigate();
+
+	const categoryName =
+		categories.find((c) => c.id === transaction.categoryId)?.name ?? "—";
 
 	const handleSubmit = async (data: z.infer<typeof transactionFormSchema>) => {
 		await updateTransaction({
@@ -100,49 +107,74 @@ function RouteComponent() {
 		<Card className="max-w-3xl mt-4">
 			<CardHeader>
 				<CardTitle className="flex justify-between">
-					<span>Edit Transaction</span>
-					<AlertDialog>
-						<AlertDialogTrigger asChild>
-							<Button variant="destructive" size="icon">
-								<Trash2Icon />
-							</Button>
-						</AlertDialogTrigger>
-						<AlertDialogContent>
-							<AlertDialogHeader>
-								<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-								<AlertDialogDescription>
-									This action cannot be undone. This transaction will be
-									permanently deleted.
-								</AlertDialogDescription>
-							</AlertDialogHeader>
-							<AlertDialogFooter>
-								<AlertDialogCancel>Cancel</AlertDialogCancel>
-								<Button
-									disabled={isDeleting}
-									variant="destructive"
-									onClick={handleDeleteConfirm}
-								>
-									{isDeleting ? "Deleting..." : "Delete"}
+					<span>{canEdit ? "Edit Transaction" : "View Transaction"}</span>
+					{canEdit && (
+						<AlertDialog>
+							<AlertDialogTrigger asChild>
+								<Button variant="destructive" size="icon">
+									<Trash2Icon />
 								</Button>
-							</AlertDialogFooter>
-						</AlertDialogContent>
-					</AlertDialog>
+							</AlertDialogTrigger>
+							<AlertDialogContent>
+								<AlertDialogHeader>
+									<AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+									<AlertDialogDescription>
+										This action cannot be undone. This transaction will be
+										permanently deleted.
+									</AlertDialogDescription>
+								</AlertDialogHeader>
+								<AlertDialogFooter>
+									<AlertDialogCancel>Cancel</AlertDialogCancel>
+									<Button
+										disabled={isDeleting}
+										variant="destructive"
+										onClick={handleDeleteConfirm}
+									>
+										{isDeleting ? "Deleting..." : "Delete"}
+									</Button>
+								</AlertDialogFooter>
+							</AlertDialogContent>
+						</AlertDialog>
+					)}
 				</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<TransactionForm
-					defaultValues={{
-						amount: Number(transaction?.amount),
-						categoryId: transaction?.categoryId,
-						description: transaction?.description,
-						transactionDate: new Date(transaction?.transactionDate),
-						transactionType:
-							categories.find(
-								(category) => category.id === transaction.categoryId,
-							)?.type ?? "income",
-					}}
-					onSubmit={handleSubmit}
-				/>
+				{canEdit ? (
+					<TransactionForm
+						defaultValues={{
+							amount: Number(transaction.amount),
+							categoryId: transaction.categoryId,
+							description: transaction.description,
+							transactionDate: new Date(transaction.transactionDate),
+							transactionType:
+								categories.find(
+									(category) => category.id === transaction.categoryId,
+								)?.type ?? "income",
+						}}
+						onSubmit={handleSubmit}
+					/>
+				) : (
+					<dl className="grid grid-cols-2 gap-4 text-sm">
+						<div>
+							<dt className="font-medium text-muted-foreground">Date</dt>
+							<dd>
+								{formatDisplayDate(new Date(transaction.transactionDate))}
+							</dd>
+						</div>
+						<div>
+							<dt className="font-medium text-muted-foreground">Category</dt>
+							<dd>{categoryName}</dd>
+						</div>
+						<div>
+							<dt className="font-medium text-muted-foreground">Amount</dt>
+							<dd>{formatCurrency(Number(transaction.amount), true)}</dd>
+						</div>
+						<div className="col-span-2">
+							<dt className="font-medium text-muted-foreground">Description</dt>
+							<dd>{transaction.description}</dd>
+						</div>
+					</dl>
+				)}
 			</CardContent>
 		</Card>
 	);

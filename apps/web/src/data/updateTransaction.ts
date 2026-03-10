@@ -2,8 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import authMiddleware from "middlewares/authMiddleware";
 import z from "zod";
-import db from "@/db";
-import { transactionsTable } from "@/db/schema";
+import db, { transactionsTable } from "@money-saver/db";
 import { sanitizeDescription } from "@/lib/sanitize";
 import {
 	amountSchema,
