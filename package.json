@@ -9,5 +9,16 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
     "typescript": "^5.7.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "bs58": "^6.0.0"
+    },
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "utf-8-validate": "5",
+        "expo": "*"
+      }
+    }
   }
 }

@@ -3,4 +3,8 @@ packages:
   - 'packages/*'
 allowBuilds:
   '@clerk/shared': false
+  browser-tabs-lock: true
+  bufferutil: true
+  core-js: true
   esbuild: false
+  utf-8-validate: true
