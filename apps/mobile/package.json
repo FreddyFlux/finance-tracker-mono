@@ -10,7 +10,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@clerk/clerk-expo": "^2.19.30",
+    "@money-saver/validations": "workspace:*",
+    "@money-saver/api-client": "workspace:*",
+    "@clerk/expo": "^3.0.1",
+    "bs58": "^6.0.0",
+    "utf-8-validate": "^5.0.2",
     "@hookform/resolvers": "^5.2.2",
     "@react-native-community/datetimepicker": "^8.6.0",
     "@rn-primitives/slot": "^1.2.0",
