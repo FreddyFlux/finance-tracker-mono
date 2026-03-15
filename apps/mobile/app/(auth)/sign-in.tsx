@@ -11,6 +11,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function SignInPage() {
   const { signIn, errors, fetchStatus } = useSignIn()
@@ -25,18 +26,12 @@ export default function SignInPage() {
       identifier: emailAddress,
       password,
     })
-    if (error) {
-      console.error(JSON.stringify(error, null, 2))
-      return
-    }
+    if (error) return
 
     if (signIn.status === 'complete') {
       await signIn.finalize({
         navigate: ({ session }) => {
-          if (session?.currentTask) {
-            console.log(session?.currentTask)
-            return
-          }
+          if (session?.currentTask) return
           router.replace('/(authed)/dashboard')
         },
       })
@@ -50,8 +45,6 @@ export default function SignInPage() {
       if (emailCodeFactor) {
         await signIn.mfa.sendEmailCode()
       }
-    } else {
-      console.error('Sign-in attempt not complete:', signIn)
     }
   }
 
@@ -61,23 +54,19 @@ export default function SignInPage() {
     if (signIn.status === 'complete') {
       await signIn.finalize({
         navigate: ({ session }) => {
-          if (session?.currentTask) {
-            console.log(session?.currentTask)
-            return
-          }
+          if (session?.currentTask) return
           router.replace('/(authed)/dashboard')
         },
       })
-    } else {
-      console.error('Sign-in attempt not complete:', signIn)
     }
   }
 
   if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
     return (
+      <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 bg-white"
+        className="flex-1"
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, padding: 20, gap: 12 }}
@@ -117,13 +106,15 @@ export default function SignInPage() {
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
+      </SafeAreaView>
     )
   }
 
   return (
+    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
+      className="flex-1"
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, padding: 20, gap: 12 }}
@@ -186,5 +177,6 @@ export default function SignInPage() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }

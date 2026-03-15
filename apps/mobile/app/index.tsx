@@ -1,21 +1,23 @@
-import { useAuth } from '@clerk/expo'
-import { Link, Redirect } from 'expo-router'
-import { ChartColumnBigIcon } from 'lucide-react-native'
-import { Pressable, View, Text } from 'react-native'
+import { useAuth } from "@clerk/expo";
+import { Link, Redirect } from "expo-router";
+import { ChartColumnBigIcon } from "lucide-react-native";
+import { Pressable, View, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
-  const { isSignedIn, isLoaded } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth();
 
   if (!isLoaded) {
-    return null
+    return null;
   }
 
   if (isSignedIn) {
-    return <Redirect href="/(authed)/dashboard" />
+    return <Redirect href="/(authed)/dashboard" />;
   }
 
   return (
-    <View className="flex-1 items-center justify-center bg-white px-6">
+    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+    <View className="flex-1 items-center justify-center px-6">
       <ChartColumnBigIcon size={48} className="text-lime-500 mb-4" />
       <Text className="mb-2 text-center text-2xl font-bold text-gray-900">
         Money Saver
@@ -26,7 +28,9 @@ export default function Index() {
       <View className="w-full max-w-xs gap-3">
         <Link href="/sign-in" asChild>
           <Pressable className="rounded-lg bg-lime-600 px-6 py-3 active:opacity-80">
-            <Text className="text-center font-semibold text-white">Sign in</Text>
+            <Text className="text-center font-semibold text-white">
+              Sign in
+            </Text>
           </Pressable>
         </Link>
         <Link href="/sign-up" asChild>
@@ -38,5 +42,6 @@ export default function Index() {
         </Link>
       </View>
     </View>
-  )
+    </SafeAreaView>
+  );
 }

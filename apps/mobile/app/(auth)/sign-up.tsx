@@ -11,6 +11,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 export default function SignUpPage() {
   const { signUp, errors, fetchStatus } = useSignUp()
@@ -26,10 +27,7 @@ export default function SignUpPage() {
       emailAddress,
       password,
     })
-    if (error) {
-      console.error(JSON.stringify(error, null, 2))
-      return
-    }
+    if (error) return
 
     if (!error) await signUp.verifications.sendEmailCode()
   }
@@ -39,15 +37,10 @@ export default function SignUpPage() {
     if (signUp.status === 'complete') {
       await signUp.finalize({
         navigate: ({ session }) => {
-          if (session?.currentTask) {
-            console.log(session?.currentTask)
-            return
-          }
+          if (session?.currentTask) return
           router.replace('/(authed)/dashboard')
         },
       })
-    } else {
-      console.error('Sign-up attempt not complete:', signUp)
     }
   }
 
@@ -61,9 +54,10 @@ export default function SignUpPage() {
     signUp.missingFields.length === 0
   ) {
     return (
+      <SafeAreaView className="flex-1 bg-white" edges={['top']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 bg-white"
+        className="flex-1"
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, padding: 20, gap: 12 }}
@@ -103,13 +97,15 @@ export default function SignUpPage() {
           </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
+      </SafeAreaView>
     )
   }
 
   return (
+    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
+      className="flex-1"
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, padding: 20, gap: 12 }}
@@ -175,5 +171,6 @@ export default function SignUpPage() {
         <View nativeID="clerk-captcha" />
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }

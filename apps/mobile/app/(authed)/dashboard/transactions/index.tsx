@@ -1,9 +1,12 @@
 import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Transactions() {
   return (
-    <View>
-      <Text>Transactions</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+      <View>
+        <Text>Transactions</Text>
+      </View>
+    </SafeAreaView>
   );
 }
