@@ -20,6 +20,7 @@ import { Route as AuthedDashboardIndexRouteImport } from './routes/_authed/dashb
 import { Route as ApiTransactionsYearsRangeRouteImport } from './routes/api/transactions/years-range'
 import { Route as ApiTransactionsIdRouteImport } from './routes/api/transactions/$id'
 import { Route as ApiRecurringTransactionsIdRouteImport } from './routes/api/recurring-transactions/$id'
+import { Route as ApiConnectionsForFilterRouteImport } from './routes/api/connections/for-filter'
 import { Route as ApiConnectionsIdRouteImport } from './routes/api/connections/$id'
 import { Route as ApiConnectionsRequestsIndexRouteImport } from './routes/api/connections/requests/index'
 import { Route as ApiRecurringTransactionsIdToggleRouteImport } from './routes/api/recurring-transactions/$id/toggle'
@@ -89,6 +90,11 @@ const ApiRecurringTransactionsIdRoute =
     path: '/api/recurring-transactions/$id',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiConnectionsForFilterRoute = ApiConnectionsForFilterRouteImport.update({
+  id: '/api/connections/for-filter',
+  path: '/api/connections/for-filter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiConnectionsIdRoute = ApiConnectionsIdRouteImport.update({
   id: '/api/connections/$id',
   path: '/api/connections/$id',
@@ -158,6 +164,7 @@ const AuthedDashboardTransactionsTransactionIdLayoutIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/connections/for-filter': typeof ApiConnectionsForFilterRoute
   '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
   '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/connections/for-filter': typeof ApiConnectionsForFilterRoute
   '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
   '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authed': typeof AuthedRouteWithChildren
   '/api/connections/$id': typeof ApiConnectionsIdRoute
+  '/api/connections/for-filter': typeof ApiConnectionsForFilterRoute
   '/api/recurring-transactions/$id': typeof ApiRecurringTransactionsIdRouteWithChildren
   '/api/transactions/$id': typeof ApiTransactionsIdRoute
   '/api/transactions/years-range': typeof ApiTransactionsYearsRangeRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/api/connections/$id'
+    | '/api/connections/for-filter'
     | '/api/recurring-transactions/$id'
     | '/api/transactions/$id'
     | '/api/transactions/years-range'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/api/connections/$id'
+    | '/api/connections/for-filter'
     | '/api/recurring-transactions/$id'
     | '/api/transactions/$id'
     | '/api/transactions/years-range'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authed'
     | '/api/connections/$id'
+    | '/api/connections/for-filter'
     | '/api/recurring-transactions/$id'
     | '/api/transactions/$id'
     | '/api/transactions/years-range'
@@ -295,6 +307,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthedRoute: typeof AuthedRouteWithChildren
   ApiConnectionsIdRoute: typeof ApiConnectionsIdRoute
+  ApiConnectionsForFilterRoute: typeof ApiConnectionsForFilterRoute
   ApiRecurringTransactionsIdRoute: typeof ApiRecurringTransactionsIdRouteWithChildren
   ApiTransactionsIdRoute: typeof ApiTransactionsIdRoute
   ApiTransactionsYearsRangeRoute: typeof ApiTransactionsYearsRangeRoute
@@ -383,6 +396,13 @@ declare module '@tanstack/react-router' {
       path: '/api/recurring-transactions/$id'
       fullPath: '/api/recurring-transactions/$id'
       preLoaderRoute: typeof ApiRecurringTransactionsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/connections/for-filter': {
+      id: '/api/connections/for-filter'
+      path: '/api/connections/for-filter'
+      fullPath: '/api/connections/for-filter'
+      preLoaderRoute: typeof ApiConnectionsForFilterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/connections/$id': {
@@ -567,6 +587,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthedRoute: AuthedRouteWithChildren,
   ApiConnectionsIdRoute: ApiConnectionsIdRoute,
+  ApiConnectionsForFilterRoute: ApiConnectionsForFilterRoute,
   ApiRecurringTransactionsIdRoute: ApiRecurringTransactionsIdRouteWithChildren,
   ApiTransactionsIdRoute: ApiTransactionsIdRoute,
   ApiTransactionsYearsRangeRoute: ApiTransactionsYearsRangeRoute,
