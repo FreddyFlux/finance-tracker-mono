@@ -1,0 +1,7 @@
+---
+description: Design system — visual tokens and UI rules (see DESIGN_SYSTEM.md)
+globs: ["**/*.tsx", "**/*.ts", "**/*.css"]
+alwaysApply: true
+---
+
+@DESIGN_SYSTEM.md
