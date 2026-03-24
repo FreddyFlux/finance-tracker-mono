@@ -12,29 +12,31 @@ export const Route = createFileRoute("/")({ component: App });
 
 function App() {
   return (
-    <div className="min-h-[400px] h-[calc(100vh-80px)] flex items-center justify-center relative">
+    <div className="min-h-[400px] h-[calc(100vh-80px)] flex items-center justify-center relative bg-violet-800">
       <img
         src="/save-money.jpg"
-        className="absolute top-0 left-0 size-full object-cover object-center opacity-40"
+        className="absolute top-0 left-0 size-full object-cover object-center opacity-20"
         alt="Cover"
       />
-      <div className="flex flex-col text-center gap-4 relative z-10">
-        <h1 className="text-4xl font-bold flex gap-1 items-center justify-center">
-          <ChartColumnBigIcon size={50} className="text-lime-500" />{" "}
-          Sparemaskin{" "}
+      <div className="flex flex-col text-center gap-6 relative z-10 max-w-3xl px-4">
+        <h1 className="text-display font-display font-semibold flex gap-3 items-center justify-center text-white">
+          <ChartColumnBigIcon size={50} className="text-amber-400" />{" "}
+          money·saver{" "}
         </h1>
-        <p className="text-2xl">Overview of your finance and spending</p>
+        <p className="font-display text-xl text-violet-200 italic">Overview of your finance and spending</p>
         <SignedIn>
-          <Button asChild size="lg">
-            <Link to="/dashboard">Go to your Dashboard</Link>
-          </Button>
+          <div className="mt-4">
+            <Button asChild size="lg" variant="amber">
+              <Link to="/dashboard">Go to your Dashboard</Link>
+            </Button>
+          </div>
         </SignedIn>
         <SignedOut>
-          <div className="flex gap-2 items-center justify-center">
-            <Button asChild size="lg" className="bg-lime-600 hover:bg-lime-700">
+          <div className="flex gap-3 items-center justify-center mt-4">
+            <Button asChild size="lg" variant="amber">
               <SignInButton />
             </Button>
-            <Button asChild size="lg">
+            <Button asChild size="lg" variant="outline">
               <SignUpButton />
             </Button>
           </div>

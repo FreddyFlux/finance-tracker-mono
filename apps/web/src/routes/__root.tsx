@@ -8,11 +8,7 @@ import {
   SignUpButton,
   UserButton,
 } from "@clerk/tanstack-react-start";
-// Only import commonly used font weights for better performance
-import poppins400 from "@fontsource/poppins/400.css?url";
-import poppins500 from "@fontsource/poppins/500.css?url";
-import poppins600 from "@fontsource/poppins/600.css?url";
-import poppins700 from "@fontsource/poppins/700.css?url";
+// Fonts are loaded via Google Fonts in styles.css
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import {
   createRootRoute,
@@ -55,22 +51,6 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: appCss,
       },
-      {
-        rel: "stylesheet",
-        href: poppins400,
-      },
-      {
-        rel: "stylesheet",
-        href: poppins500,
-      },
-      {
-        rel: "stylesheet",
-        href: poppins600,
-      },
-      {
-        rel: "stylesheet",
-        href: poppins700,
-      },
     ],
   }),
 
@@ -80,10 +60,10 @@ export const Route = createRootRoute({
 
 function NotFoundComponent() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center min-h-screen bg-violet-800">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
-        <p className="text-gray-600 mb-4">
+        <h1 className="font-display text-2xl font-medium mb-4 text-white">404 - Page Not Found</h1>
+        <p className="text-violet-200 mb-4">
           The page you're looking for doesn't exist.
         </p>
       </div>
@@ -101,25 +81,25 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <HeadContent />
           </head>
           <body suppressHydrationWarning>
-            <nav className="bg-primary p-4 h-20 w-full text-white flex items-center justify-between">
+            <nav className="sticky top-0 z-50 bg-violet-800/95 backdrop-blur-md border-b border-violet-700/30 px-6 py-4 w-full flex items-center justify-between">
               <Link
                 to="/"
-                className="flex gap-1 items-center font-bold text-2xl"
+                className="flex gap-2 items-center font-display text-xl hover:opacity-90 transition-opacity"
               >
-                <ChartColumnBigIcon className="text-lime-500 w-6 h-6" />{" "}
-                TanTracker
+                <ChartColumnBigIcon className="text-amber-400 w-7 h-7" />
+                <span className="text-white font-semibold">money</span>
+                <span className="text-amber-400 text-2xl leading-none">·</span>
+                <span className="text-white font-semibold">saver</span>
               </Link>
-              <div>
+              <div className="flex items-center gap-3">
                 <SignedOut>
-                  <div className="text-white flex items-center">
-                    <Button asChild variant="link" className="text-white">
+                  <div className="flex items-center gap-2">
+                    <Button asChild variant="ghost" className="text-violet-200 hover:text-white hover:bg-violet-700/50 transition-colors">
                       <SignInButton />
                     </Button>
-                    <div className="text-white flex items-center">
-                      <Button asChild variant="link" className="text-white">
-                        <SignUpButton />
-                      </Button>
-                    </div>
+                    <Button asChild className="bg-amber-500 text-violet-900 hover:bg-amber-400 font-medium rounded-full px-5 shadow-md">
+                      <SignUpButton />
+                    </Button>
                   </div>
                 </SignedOut>
                 <SignedIn>
@@ -127,9 +107,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                     showName
                     appearance={{
                       elements: {
-                        userButtonAvatarBox: { border: "1px solid white" },
+                        userButtonAvatarBox: {
+                          border: "2px solid rgba(255, 190, 77, 0.3)",
+                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+                        },
                         userButtonOuterIdentifier: {
                           color: "white",
+                          fontWeight: "500",
                         },
                       },
                     }}
@@ -146,7 +130,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               </div>
             </nav>
 
-            {children}
+            <main className="min-h-screen">
+              {children}
+            </main>
             <Toaster />
             {import.meta.env.DEV && (
               <TanStackDevtools

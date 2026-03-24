@@ -1,8 +1,10 @@
 import { useNavigate } from "@tanstack/react-router";
-import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
 	ChartContainer,
+	ChartLegend,
+	ChartLegendContent,
 	ChartTooltip,
 	ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -61,30 +63,34 @@ export function Cashflow({
 					config={{
 						income: {
 							label: "Income",
-							color: "#84cc16",
+							color: "#FFBE4D",
 						},
 						expense: {
 							label: "Expenses",
-							color: "#f97316",
+							color: "#D966A8",
 						},
 					}}
 					className="w-full h-[300px]"
 				>
 					<BarChart data={annualCashflow}>
-						<CartesianGrid vertical={false} />
-						<YAxis tickFormatter={formatCurrencyChart} />
+						<CartesianGrid vertical={false} stroke="#5B3FA8" strokeOpacity={0.3} />
+						<YAxis tickFormatter={formatCurrencyChart} tick={{ fill: '#B89FD8' }} />
 						<XAxis
 							dataKey="month"
 							tickFormatter={(value) => formatMonth(value, year)}
+							tick={{ fill: '#B89FD8' }}
 						/>
 						<ChartTooltip
 							content={
 								<ChartTooltipContent
 									formatter={(value, name) => {
+										const isIncome = name === "income";
 										return (
 											<div>
-												{name === "income" ? "Income" : "Expenses"}:{" "}
-												{formatCurrency(Number(value))}
+												{isIncome ? "Income" : "Expenses"}:{" "}
+												<span className={isIncome ? "text-amber-400" : "text-pink-300"}>
+													{formatCurrency(Number(value))}
+												</span>
 											</div>
 										);
 									}}
@@ -98,34 +104,37 @@ export function Cashflow({
 								/>
 							}
 						/>
-						<Legend align="right" verticalAlign="top" />
+						<ChartLegend
+							content={<ChartLegendContent className="text-violet-200" />}
+							verticalAlign="top"
+						/>
 						<Bar dataKey="income" fill="var(--color-income)" radius={4} />
 						<Bar dataKey="expense" fill="var(--color-expense)" radius={4} />
 					</BarChart>
 				</ChartContainer>
-				<div className="border-l px-4 flex flex-col gap-2 justify-center">
-					<span className="text-m text-muted-foreground">Income</span>
+				<div className="border-l border-violet-700 px-4 flex flex-col gap-2 justify-center">
+					<span className="text-xs text-violet-200 uppercase tracking-wide font-medium">Income</span>
 
-					<h2 className="text-3xl font-semibold">
+					<h2 className="text-number text-amber-400">
 						{formatCurrency(totalAnnualIncome)}
 					</h2>
 
-					<div className="h-px bg-border w-full" />
+					<div className="h-px bg-violet-700 w-full" />
 
-					<span className="text-m text-muted-foreground">Expenses</span>
+					<span className="text-xs text-violet-200 uppercase tracking-wide font-medium">Expenses</span>
 
-					<h2 className="text-3xl font-semibold">
+					<h2 className="text-number text-pink-300">
 						{formatCurrency(totalAnnualExpense)}
 					</h2>
 
-					<div className="h-px bg-border w-full" />
+					<div className="h-px bg-violet-700 w-full" />
 
-					<span className="text-m text-muted-foreground">Balance</span>
+					<span className="text-xs text-violet-200 uppercase tracking-wide font-medium">Balance</span>
 
 					<h2
 						className={cn(
-							"text-3xl font-bold",
-							balance > 0 ? "text-green-500" : "text-orange-500",
+							"text-number-lg",
+							balance > 0 ? "amount-positive" : "amount-negative",
 						)}
 					>
 						{formatCurrency(balance)}

@@ -23,6 +23,12 @@ importers:
       '@clerk/expo':
         specifier: ^3.0.1
         version: 3.0.1(0843e2bf95f3f8f7f107b46171bba145)
+      '@expo-google-fonts/cormorant-garamond':
+        specifier: ^0.4.1
+        version: 0.4.1
+      '@expo-google-fonts/dm-sans':
+        specifier: ^0.4.2
+        version: 0.4.2
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.4))
@@ -1572,6 +1578,12 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@expo-google-fonts/cormorant-garamond@0.4.1':
+    resolution: {integrity: sha512-e8J4Cn13K1txygamg50n3odLUsYP7Ck28XOGobMi7uDsWvFmp/jgK0qcALqJTlmi9NczSWUNdERxcLauHCBa/Q==}
+
+  '@expo-google-fonts/dm-sans@0.4.2':
+    resolution: {integrity: sha512-e/fLH5aCJzkEenz7axvEn8N7IJAKhUwNjIxS75h9j+Ip1M9S7d22M19gJN3A7QW4egVkBJRyQh1hQFhngQn9yA==}
 
   '@expo-google-fonts/material-symbols@0.4.25':
     resolution: {integrity: sha512-MlwOpcYPLYu2+aDAwqv29l3sknNNxA36Jcu07Tg9+MTEvXk2SPcO8eQmwwDeVBbv5Wb6ToD1LmE+e0lLv/9WvA==}
@@ -8056,6 +8068,10 @@ snapshots:
   '@exodus/bytes@1.15.0(@noble/hashes@1.8.0)':
     optionalDependencies:
       '@noble/hashes': 1.8.0
+
+  '@expo-google-fonts/cormorant-garamond@0.4.1': {}
+
+  '@expo-google-fonts/dm-sans@0.4.2': {}
 
   '@expo-google-fonts/material-symbols@0.4.25': {}
 

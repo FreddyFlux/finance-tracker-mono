@@ -1,11 +1,20 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
+/* =============================================================================
+   money-saver Design System tokens
+   Derived from the Purple Mood Board (Freepik #6155040)
+   These live alongside shadcn/ui tokens — do NOT remove the :root / .dark blocks
+   ============================================================================= */
+
 body {
   @apply m-0;
-  font-family: "Poppins", sans-serif;
+  font-family: "DM Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -16,6 +25,7 @@ code {
 }
 
 @theme inline {
+  /* ── shadcn/ui token aliases (keep intact — components depend on these) ── */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -51,8 +61,81 @@ code {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ── Fonts ── */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body:    "DM Sans", system-ui, sans-serif;
+  --font-sans:    "DM Sans", system-ui, sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Code", monospace;
+
+  /* ── Violet (Primary) ── */
+  --color-violet-50:  #F7F3FE;
+  --color-violet-100: #EAE0FB;
+  --color-violet-200: #D4C4F0;
+  --color-violet-300: #B89FD8;
+  --color-violet-400: #9B7DE0;
+  --color-violet-500: #7B5CC8;
+  --color-violet-600: #5B3FA8;
+  --color-violet-700: #3D2B7A;
+  --color-violet-800: #2D1F5E;
+  --color-violet-900: #1A1235;
+
+  /* ── Amber (Accent) ── */
+  --color-amber-50:  #FFFBF0;
+  --color-amber-100: #FFF4DC;
+  --color-amber-200: #FFE8A8;
+  --color-amber-300: #FFD07A;
+  --color-amber-400: #FFBE4D;
+  --color-amber-500: #F5A623;
+  --color-amber-600: #D48B0F;
+  --color-amber-700: #B8720A;
+
+  /* ── Lilac (Support) ── */
+  --color-lilac-50:  #F4F0FF;
+  --color-lilac-100: #EDE5FF;
+  --color-lilac-200: #E6DEFF;
+  --color-lilac-400: #C9BAEF;
+  --color-lilac-600: #8B6BBF;
+
+  /* ── Pink (Support) ── */
+  --color-pink-100: #FCE8F5;
+  --color-pink-300: #EE9ECD;
+  --color-pink-500: #D966A8;
+
+  /* ── Semantic ── */
+  --color-success:       #1D9E75;
+  --color-success-light: #E1F5EE;
+  --color-danger:        #D85A30;
+  --color-danger-light:  #FAECE7;
+  --color-warning:       #F5A623;
+  --color-warning-light: #FFF4DC;
+  --color-info:          #5B3FA8;
+  --color-info-light:    #EAE0FB;
+
+  /* ── Neutrals (purple-tinted) ── */
+  --color-gray-50:  #FAFAF9;
+  --color-gray-100: #F0EDF8;
+  --color-gray-200: #DDD8EE;
+  --color-gray-300: #C4BEDD;
+  --color-gray-400: #8A849A;
+  --color-gray-600: #5A5468;
+  --color-gray-900: #1A1630;
+
+  /* ── Design system radius overrides ── */
+  /* NOTE: these override the shadcn calc() aliases above intentionally */
+  --ds-radius-sm:   6px;
+  --ds-radius-md:   10px;
+  --ds-radius-lg:   16px;
+  --ds-radius-xl:   24px;
+  --ds-radius-pill: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 4px rgba(44, 24, 100, 0.08);
+  --shadow-md: 0 4px 16px rgba(44, 24, 100, 0.12);
+  --shadow-lg: 0 8px 32px rgba(44, 24, 100, 0.18);
 }
 
+/* ── shadcn/ui light theme (keep intact) ── */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -72,22 +155,23 @@ code {
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+/* ── shadcn/ui dark theme (keep intact) ── */
 .dark {
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
@@ -127,6 +211,141 @@ code {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-violet-800 text-white;
   }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.15;
+  }
+}
+
+/* =============================================================================
+   Design System Utilities
+   Use these classes directly in your components
+   ============================================================================= */
+@layer utilities {
+  /* Typography */
+  .font-display   { font-family: var(--font-display); }
+  .font-body      { font-family: var(--font-body); }
+
+  .text-display {
+    font-family: var(--font-display);
+    font-size: 2.625rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .text-display-italic {
+    font-family: var(--font-display);
+    font-size: 2.625rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1.1;
+  }
+  .text-overline {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .text-number {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .text-number-lg {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.05;
+  }
+
+  /* Amount colours */
+  .amount-negative { color: var(--color-violet-700); }
+  .amount-positive { color: var(--color-success); }
+
+  /* Card variants */
+  .card-dark {
+    background: var(--color-violet-900);
+    border: 0.5px solid var(--color-violet-700);
+    border-radius: var(--ds-radius-lg);
+    padding: 1.25rem;
+  }
+  .card-lilac {
+    background: var(--color-lilac-50);
+    border: 0.5px solid var(--color-violet-200);
+    border-radius: var(--ds-radius-lg);
+    padding: 1.25rem;
+  }
+  .card-amber {
+    background: var(--color-amber-50);
+    border: 0.5px solid var(--color-amber-300);
+    border-radius: var(--ds-radius-lg);
+    padding: 1.25rem;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--color-violet-600);
+    color: white;
+    border-radius: var(--ds-radius-pill);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    box-shadow: 0 2px 12px rgba(91, 63, 168, 0.32);
+    text-decoration: none;
+  }
+  .btn-primary:hover {
+    background: var(--color-violet-700);
+    transform: translateY(-1px);
+  }
+  .btn-amber {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.625rem 1.25rem;
+    background: var(--color-amber-500);
+    color: var(--color-violet-900);
+    border-radius: var(--ds-radius-pill);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    box-shadow: 0 2px 12px rgba(245, 166, 35, 0.32);
+    text-decoration: none;
+  }
+  .btn-amber:hover {
+    background: var(--color-amber-400);
+    transform: translateY(-1px);
+  }
+
+  /* Badge variants */
+  .badge-violet  { background: var(--color-violet-100); color: var(--color-violet-700); }
+  .badge-amber   { background: var(--color-amber-100);  color: var(--color-amber-700);  }
+  .badge-success { background: var(--color-success-light); color: #0F6E56; }
+  .badge-danger  { background: var(--color-danger-light);  color: #993C1D; }
+  .badge-pink    { background: var(--color-pink-100);   color: #8B3570;  }
+
+  /* Progress bar */
+  .progress-track {
+    height: 6px;
+    background: var(--color-gray-100);
+    border-radius: var(--ds-radius-pill);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: var(--ds-radius-pill);
+    transition: width 0.4s ease;
+  }
+
+  /* App shell - background now handled via Tailwind for glassmorphism */
 }

@@ -12,7 +12,7 @@ export function EmptyState({
 	return (
 		<p
 			className={cn(
-				"text-center py-10 text-lg text-muted-foreground",
+				"text-center py-10 text-lg text-violet-300",
 				className,
 			)}
 		>

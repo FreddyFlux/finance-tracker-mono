@@ -68,12 +68,12 @@
 
 ### Semantic
 
-| Token     | Hex       | Usage                       |
-| --------- | --------- | --------------------------- |
-| `success` | `#1D9E75` | Income, positive delta      |
-| `danger`  | `#D85A30` | Expenses over budget        |
-| `warning` | `#F5A623` | Budget alerts (= amber-500) |
-| `info`    | `#5B3FA8` | Info states (= violet-600)  |
+| Token     | Hex       | Usage                            |
+| --------- | --------- | -------------------------------- |
+| `success` | `#1D9E75` | Paid status, budget under limit  |
+| `danger`  | `#D85A30` | Overdue, over budget             |
+| `warning` | `#F5A623` | Budget alerts (= amber-500)      |
+| `info`    | `#5B3FA8` | Info states (= violet-600)       |
 
 ### Neutrals
 
@@ -135,18 +135,18 @@
 
 All use `radius-pill`, `10px` font, 500 weight:
 
-- `violet-100` bg / `violet-700` text — general / income
-- `amber-100` bg / `amber-700` text — savings / goals
+- `amber-100` bg / `amber-700` text — income / positive
+- `pink-100` bg / `#8B3570` text — expense / negative
 - `#E1F5EE` bg / `#0F6E56` text — success / paid
 - `#FAECE7` bg / `#993C1D` text — danger / overdue
-- `pink-100` bg / `#8B3570` text — subscriptions
+- `violet-100` bg / `violet-700` text — general categories
 
 ### Transaction Rows
 
 - 38×38 icon tile: `radius-md`, category-tinted bg
 - Name: 13px, 500 weight, `gray-900`
 - Category + date: 11px, `gray-400`
-- Amount: `font-display`, 15px, 600 — negative = `violet-700`, positive = `success`
+- Amount: `font-display`, 15px, 600 — positive (income) = `amber-600`, negative (expense) = `pink-500`
 
 ### Progress Bars
 
@@ -155,11 +155,11 @@ All use `radius-pill`, `10px` font, 500 weight:
 
 ### Data Visualization Colors (in order)
 
-1. `violet-500` — primary category
-2. `lilac-600` — secondary category
-3. `amber-500` — tertiary / budget
-4. `pink-500` — subscriptions
-5. `success` (#1D9E75) — income
+1. `amber-500` — income / positive cashflow
+2. `pink-500` — expenses / negative cashflow
+3. `violet-500` — primary category
+4. `lilac-600` — secondary category
+5. `success` (#1D9E75) — paid status / under budget
 
 ---
 
@@ -177,22 +177,11 @@ All use `radius-pill`, `10px` font, 500 weight:
 
 | File                   | Path                                        |
 | ---------------------- | ------------------------------------------- |
-| Web CSS tokens         | `apps/web/src/styles/globals.css`           |
+| Web CSS tokens         | `apps/web/src/styles.css`                   |
 | Mobile Tailwind config | `apps/mobile/tailwind.config.js`            |
 | Shared token reference | `packages/validations/src/design-tokens.ts` |
 
----
-
-## Related agent documentation
-
-| Document | Purpose |
-| -------- | ------- |
-| `AGENTS.md` | Monorepo layout, packages, API design, env vars |
-| `apps/web/AGENTS.md` | Web stack (TanStack Start, Tailwind v4, Clerk) |
-| `apps/mobile/AGENTS.md` | Mobile stack (Expo, NativeWind, Clerk) |
-| `docs/ai/AGENT-DOCS-PLAN.md` | How agent docs stay aligned with Cursor and Claude Code |
-
-**Split of concerns:** update **`DESIGN_SYSTEM.md`** for fonts, colors, and UI patterns; update **`AGENTS.md`** (and app `AGENTS.md`) for architecture, packages, and API workflows.
+> **Note on `apps/web/src/styles.css`**: this file already contains shadcn/ui `@theme inline` mappings and `:root`/`.dark` oklch tokens — do **not** remove those. The design system tokens are added _alongside_ them in the same `@theme inline` block.
 
 ---
 
@@ -200,9 +189,10 @@ All use `radius-pill`, `10px` font, 500 weight:
 
 1. **Never use Inter, Roboto, or Arial** — always Cormorant Garamond (display) + DM Sans (body)
 2. **Violet is primary, amber is accent** — never the reverse for primary actions
-3. **Positive cashflow = `success` green**, negative = `violet-700` (NOT red — we avoid alarming color for normal spend)
-4. **Danger red only for overdue/over-budget** states
-5. **Dark cards (`violet-900`) should always pair amber numbers** — never violet numbers on violet bg
-6. **All Tailwind classes on web use `v4` syntax** (no `theme()` function needed — CSS vars available directly)
-7. **All Tailwind classes on mobile use `v3` config** via `tailwind.config.js` extension — NativeWind v4 requirement
-8. **Mobile never imports `@money-saver/db`** — only via API through `@money-saver/api-client`
+3. **Income/positive amounts = `amber-600`**, expenses/negative amounts = `pink-500`
+4. **Success green (`#1D9E75`) is for paid status and under-budget** — NOT for income
+5. **Danger red only for overdue/over-budget** states
+6. **Dark cards (`violet-900`) should always pair amber numbers** — never violet numbers on violet bg
+7. **All Tailwind classes on web use `v4` syntax** (no `theme()` function needed — CSS vars available directly)
+8. **All Tailwind classes on mobile use `v3` config** via `tailwind.config.js` extension — NativeWind v4 requirement
+9. **Mobile never imports `@money-saver/db`** — only via API through `@money-saver/api-client`

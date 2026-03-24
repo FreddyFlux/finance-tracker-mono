@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authed/dashboard/transactions/_layout")(
 
 function RouteComponent() {
 	return (
-		<div className="max-w-7xl mx-auto py-10 px-4">
+		<div className="max-w-7xl mx-auto py-10 px-4 bg-violet-800 min-h-screen">
 			<Breadcrumb>
 				<BreadcrumbList>
 					<BreadcrumbItem>

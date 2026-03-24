@@ -1,7 +1,124 @@
+# money-saver · Cursor AI Rules
+# Place this file at: .cursor/rules/design-system.mdc
+# These rules are always active and guide Cursor AI suggestions.
+
 ---
-description: Design system — visual tokens and UI rules (see DESIGN_SYSTEM.md)
+description: Design system rules for money-saver monorepo
 globs: ["**/*.tsx", "**/*.ts", "**/*.css"]
 alwaysApply: true
 ---
 
-@DESIGN_SYSTEM.md
+## money-saver Design System
+
+This project uses a custom design system derived from a **Purple Mood Board**.
+
+### Fonts — ALWAYS use these, NEVER use Inter/Roboto/Arial/system-ui
+
+- **Display / Numbers**: `Cormorant Garamond` (weights: 400, 500, 600; also italic)
+- **Body / UI**: `DM Sans` (weights: 300, 400, 500)
+
+**Web** (Tailwind v4): Use `font-display` and `font-sans` classes (defined in globals.css)  
+**Mobile** (NativeWind): Use font family names from `tailwind.config.js` fontFamily extension
+
+### Color Palette — Core Tokens
+
+**Primary — Violet** (use for primary actions, nav background, default text)
+- `violet-600` `#5B3FA8` — buttons, interactive elements, links
+- `violet-700` `#3D2B7A` — primary text, negative amount values
+- `violet-900` `#1A1235` — dark nav shell, hero backgrounds
+- `violet-100` `#EAE0FB` — badges, tinted backgrounds
+
+**Accent — Amber** (use for CTAs, income, positive amounts)
+- `amber-500` `#F5A623` — CTA buttons, chart fills
+- `amber-600` `#D48B0F` — income indicators, positive amounts
+- `amber-400` `#FFBE4D` — highlights on dark backgrounds
+- `amber-700` `#B8720A` — amber text on light backgrounds
+
+**Support**
+- `lilac-600` `#8B6BBF` — transport category, secondary charts
+- `pink-500` `#D966A8` — expenses, negative amounts
+- `success` `#1D9E75` — paid status, under budget
+- `danger` `#D85A30` — overdue, over-budget ONLY
+
+### Critical Color Rules
+
+1. Income/positive amounts = `amber-600` (`#D48B0F`)
+2. Expenses/negative amounts = `pink-500` (`#D966A8`)
+3. Success green (`#1D9E75`) is for paid status and under-budget ONLY, NOT for income
+4. Danger red only for overdue/over-budget states
+5. Dark cards (`violet-900` bg) → numbers in `amber-400`, label text in `violet-300`
+6. Primary actions = violet; financial CTAs (new budget, add funds) = amber
+
+### Tailwind Usage
+
+**Web** (Tailwind v4 — `apps/web`):
+```tsx
+// Use CSS variable tokens via custom classes
+<div className="card">...</div>
+<button className="btn-primary">...</button>
+<span className="badge badge-violet">Income</span>
+// Or use color utilities with the extended palette
+<div className="bg-violet-900 text-violet-300">...</div>
+<span className="text-amber-500">+12.4%</span>
+```
+
+**Mobile** (NativeWind v4 / Tailwind v3 — `apps/mobile`):
+```tsx
+// Always use className prop (never inline style for Tailwind utilities)
+<View className="bg-violet-900 rounded-xl p-5">
+  <Text className="font-display text-4xl text-amber-400">€ 4,820</Text>
+  <Text className="font-body text-sm text-violet-300">Net balance</Text>
+</View>
+// NEVER: <View style={{ backgroundColor: '#1A1235' }}> for Tailwind utilities
+```
+
+### Component Patterns
+
+**Cards**:
+- Default: `card` class (web) / `bg-white border border-gray-200 rounded-lg p-5` (mobile)
+- Dark: `card-dark` / `bg-violet-900 border border-violet-700 rounded-lg p-5`
+- Lilac: `card-lilac` / `bg-lilac-50 border border-violet-200 rounded-lg p-5`
+- Amber: `card-amber` / `bg-amber-50 border border-amber-300 rounded-lg p-5`
+
+**Metric display**:
+```tsx
+// Always use display font for currency values
+<p className="text-overline text-gray-400">Net Balance</p>
+<p className="text-number text-violet-700">€ 4,820</p>
+<p className="text-xs text-amber-600">↑ 8.2% this month</p> {/* Positive change */}
+<p className="text-xs text-pink-500">↓ 3.4% this month</p> {/* Negative change */}
+```
+
+**Transaction amounts**:
+```tsx
+<Text className={amount > 0 ? 'text-amber-600 font-display' : 'text-pink-500 font-display'}>
+  {amount > 0 ? '+ ' : '− '}€ {Math.abs(amount).toFixed(2)}
+</Text>
+```
+
+### Editing `apps/web/src/styles.css`
+
+This file contains **both** shadcn/ui tokens and design system tokens. When editing it:
+- The `:root` / `.dark` oklch blocks are shadcn/ui — **never remove or rewrite them**
+- Design system tokens (`--color-violet-*`, `--color-amber-*`, etc.) live inside the same `@theme inline` block
+- `--ds-radius-*` tokens are used for design system components; `--radius-*` stay as shadcn calc() aliases
+- The `body` font-family is `DM Sans` — do not revert to Poppins or Inter
+
+### Architecture Constraints (ALWAYS respect)
+
+1. `apps/mobile` NEVER imports `@money-saver/db` — DB has Node.js deps unavailable in RN
+2. Mobile only calls APIs via `@money-saver/api-client` REST hooks
+3. All DB access is server-side in `apps/web` via `createServerFn`
+4. Package manager is **pnpm only** — never suggest `npm install` or `yarn`
+5. Web uses Tailwind **v4**, mobile uses Tailwind **v3** (NativeWind v4 requirement)
+6. Mobile forms: use `<Controller>` from react-hook-form, not `register()` (DOM-only)
+7. Use `@clerk/tanstack-start` on web, `@clerk/expo` on mobile (NOT `@clerk/clerk-expo`)
+
+### File Locations
+
+| Resource | Path |
+|----------|------|
+| Web CSS tokens | `apps/web/src/styles.css` |
+| Mobile Tailwind | `apps/mobile/tailwind.config.js` |
+| Shared TS tokens | `packages/validations/src/design-tokens.ts` |
+| Design docs | `DESIGN_SYSTEM.md` (repo root) |

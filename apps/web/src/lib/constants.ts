@@ -17,6 +17,6 @@ export const DATE_FORMATS = {
 export const CURRENCY_SYMBOL = "€";
 
 export const TRANSACTION_TYPE_COLORS = {
-	income: "bg-lime-500",
-	expense: "bg-rose-500",
+	income: "bg-amber-400 text-violet-900",
+	expense: "bg-pink-500 text-white",
 } as const;

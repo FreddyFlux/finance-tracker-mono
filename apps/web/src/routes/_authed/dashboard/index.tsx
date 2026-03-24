@@ -11,8 +11,8 @@ import { RecentTransactions } from "./-recent-transactions";
 
 export const Route = createFileRoute("/_authed/dashboard/")({
 	pendingComponent: () => (
-		<div className="max-w-7xl mx-auto py-5 px-3">
-			<h1 className="text-4xl font-semibold pb-5">Dashboard</h1>
+		<div className="max-w-7xl mx-auto py-5 px-3 bg-violet-800 min-h-screen">
+			<h1 className="font-display text-2xl font-medium pb-5 text-white">Dashboard</h1>
 			<LoadingSkeleton />
 		</div>
 	),
@@ -53,8 +53,8 @@ export const Route = createFileRoute("/_authed/dashboard/")({
 function Dashboard() {
 	const { transactions, cashflow, cfyear, userIds } = Route.useLoaderData();
 	return (
-		<div className="max-w-7xl mx-auto py-5 px-3">
-			<h1 className="text-4xl font-semibold pb-5">Dashboard</h1>
+		<div className="max-w-7xl mx-auto py-5 px-3 bg-violet-800 min-h-screen">
+			<h1 className="font-display text-2xl font-medium pb-5 text-white">Dashboard</h1>
 			<DashboardFilters initialUserIds={userIds} />
 			<Cashflow year={cfyear} annualCashflow={cashflow} />
 			<RecentTransactions transactions={transactions} />

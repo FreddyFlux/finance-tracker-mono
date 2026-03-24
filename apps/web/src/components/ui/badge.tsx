@@ -5,18 +5,24 @@ import type * as React from "react";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-	"inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+	"inline-flex items-center justify-center rounded-full border-0 px-2.5 py-1 text-[10px] font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:ring-ring/50 focus-visible:ring-[3px] transition-[color,box-shadow] overflow-hidden",
 	{
 		variants: {
 			variant: {
 				default:
-					"border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
-				secondary:
-					"border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-				destructive:
-					"border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+					"bg-violet-100 text-violet-700",
+				violet:
+					"bg-violet-100 text-violet-700",
+				amber:
+					"bg-amber-100 text-amber-700",
+				success:
+					"bg-[#E1F5EE] text-[#0F6E56]",
+				danger:
+					"bg-[#FAECE7] text-[#993C1D]",
+				pink:
+					"bg-pink-100 text-[#8B3570]",
 				outline:
-					"text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+					"border border-violet-400 text-violet-200 [a&]:hover:bg-violet-700/50",
 			},
 		},
 		defaultVariants: {
