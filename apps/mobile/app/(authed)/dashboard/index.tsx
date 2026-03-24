@@ -56,7 +56,7 @@ export default function DashboardHome() {
       <View className="flex-1 p-6">
         <Text className="mb-6 font-display-medium text-2xl text-white">Dashboard</Text>
 
-        {/* Same pattern as chart → Transactions: one column, gap-6 between major blocks */}
+        {/* Same pattern as chart -> Transactions: one column, gap-6 between major blocks */}
         <View className="gap-6">
           <UserFilter value={selectedUserIds} onChange={setSelectedUserIds} />
 
@@ -86,7 +86,11 @@ export default function DashboardHome() {
                   Expenses: {formatCurrency(totalExpense)}
                 </Text>
                 <Text
-                  className={`font-display text-md ${balance >= 0 ? 'text-amber-400' : 'text-pink-300'}`}
+                  className={
+                    balance >= 0
+                      ? 'font-display text-md text-amber-400'
+                      : 'font-display text-md text-pink-300'
+                  }
                 >
                   Balance: {formatCurrency(balance)}
                 </Text>

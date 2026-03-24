@@ -1,15 +1,34 @@
 import type { MonthlyCashflow } from '@money-saver/api-client'
+import { DMSans_400Regular } from '@expo-google-fonts/dm-sans'
 import { colors, CURRENCY_SYMBOL } from '@money-saver/validations'
 import { format } from 'date-fns'
 import numeral from 'numeral'
 import { Fragment, useCallback, useMemo, useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { runOnJS, useAnimatedReaction } from 'react-native-reanimated'
-import { matchFont, Rect } from '@shopify/react-native-skia'
+import {
+  Group,
+  LinearGradient,
+  Line,
+  Rect,
+  useFont,
+  vec,
+} from '@shopify/react-native-skia'
 import { BarGroup, CartesianChart, useChartPressState } from 'victory-native'
 
+/** Slightly richer than flat fills — reads better on dark gradient */
 const INCOME_COLOR = colors.amber[500]
 const EXPENSE_COLOR = colors.pink[500]
+
+const BAR_TOP_RADIUS = 6
+
+/** Enough output padding so the first/last bar group is not clipped (bars extend groupWidth/2 past each tick). */
+const DOMAIN_PAD_X = 40
+
+const TICK_LEN = 5
+const GRID_Y = 'rgba(186, 159, 216, 0.34)'
+const GRID_X = 'rgba(186, 159, 216, 0.22)'
+const TICK_STROKE = 'rgba(212, 196, 235, 0.95)'
 
 function formatCurrency(amount: number): string {
   return `${CURRENCY_SYMBOL}${numeral(amount).format('0,0')}`
@@ -24,13 +43,57 @@ export function CashflowChart({
   year: number
   onMonthPress?: (month: number) => void
 }) {
-  const font = useMemo(
-    () =>
-      matchFont({
-        fontFamily: 'DMSans_400Regular',
-        fontSize: 11,
-        fontWeight: '400',
-      }),
+  /**
+   * Skia cannot use `matchFont` with Expo font family names — it needs the bundled TTF via `useFont`.
+   * Without this, axis labels are omitted while grid/ticks still render.
+   */
+  const axisFont = useFont(DMSans_400Regular, 11)
+
+  const chartSurfaceColors = useMemo(
+    () => [colors.violet[900], colors.violet[800]],
+    [],
+  )
+
+  const axisTickMarks = useCallback(
+    (args: {
+      xScale: (n: number) => number
+      yScale: (n: number) => number
+      xTicks: number[]
+      yTicks: number[]
+      chartBounds: { left: number; right: number; top: number; bottom: number }
+    }) => {
+      const { xScale, yScale, xTicks, yTicks, chartBounds } = args
+      return (
+        <Group>
+          {xTicks.map((tick) => {
+            const x = xScale(tick)
+            if (x < chartBounds.left || x > chartBounds.right) return null
+            return (
+              <Line
+                key={`xtick-${tick}`}
+                p1={vec(x, chartBounds.bottom)}
+                p2={vec(x, chartBounds.bottom + TICK_LEN)}
+                color={TICK_STROKE}
+                strokeWidth={1}
+              />
+            )
+          })}
+          {yTicks.map((tick) => {
+            const y = yScale(tick)
+            if (y < chartBounds.top || y > chartBounds.bottom) return null
+            return (
+              <Line
+                key={`ytick-${tick}`}
+                p1={vec(chartBounds.left - TICK_LEN, y)}
+                p2={vec(chartBounds.left, y)}
+                color={TICK_STROKE}
+                strokeWidth={1}
+              />
+            )
+          })}
+        </Group>
+      )
+    },
     [],
   )
 
@@ -66,33 +129,52 @@ export function CashflowChart({
 
   const axisOptions = useMemo(
     () => ({
-      font,
-      tickCount: { x: 6, y: 5 },
+      font: axisFont ?? undefined,
+      tickCount: { x: 12, y: 5 },
       formatXLabel: (value: number) =>
         format(new Date(year, Number(value) - 1, 1), 'MMM'),
       formatYLabel: (value: number) =>
         `${CURRENCY_SYMBOL}${numeral(value).format('0,0')}`,
-      labelColor: colors.violet[300],
+      labelColor: { x: colors.violet[200], y: colors.violet[300] },
+      lineColor: {
+        grid: {
+          x: GRID_X,
+          y: GRID_Y,
+        },
+        frame: 'rgba(123, 92, 200, 0.35)',
+      },
+      lineWidth: {
+        grid: { x: 1, y: 1 },
+        frame: 1,
+      },
       axisSide: { x: 'bottom' as const, y: 'left' as const },
       labelPosition: { x: 'outset' as const, y: 'outset' as const },
+      labelOffset: { x: 0, y: 6 },
     }),
-    [font, year],
+    [axisFont, year],
   )
 
   const domainPadding = useMemo(
-    () => ({ left: 1, right: 1, top: 0.05, bottom: 0.05 }),
+    () => ({
+      left: DOMAIN_PAD_X,
+      right: DOMAIN_PAD_X,
+      top: 16,
+      bottom: 4,
+    }),
     [],
   )
+
+  const xDomain = useMemo(() => ({ x: [1, 12] as [number, number] }), [])
 
   return (
     <View style={styles.container}>
       <View style={styles.legend}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: INCOME_COLOR }]} />
+        <View style={styles.legendPill}>
+          <View style={[styles.legendSwatch, { backgroundColor: INCOME_COLOR }]} />
           <Text style={styles.legendText}>Income</Text>
         </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: EXPENSE_COLOR }]} />
+        <View style={styles.legendPill}>
+          <View style={[styles.legendSwatch, { backgroundColor: EXPENSE_COLOR }]} />
           <Text style={styles.legendText}>Expenses</Text>
         </View>
       </View>
@@ -103,32 +185,47 @@ export function CashflowChart({
           xKey="month"
           yKeys={['income', 'expense']}
           axisOptions={axisOptions}
+          domain={xDomain}
           domainPadding={domainPadding}
+          renderOutside={axisTickMarks}
           chartPressState={pressState}
           chartPressConfig={{
             pan: { activateAfterLongPress: 50 },
           }}
-          padding={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          padding={{ top: 12, bottom: 32, left: 8, right: 12 }}
         >
-          {({ points, chartBounds }) => (
-            <Fragment>
-              <Rect
-                x={chartBounds.left}
-                y={chartBounds.top}
-                width={chartBounds.right - chartBounds.left}
-                height={chartBounds.bottom - chartBounds.top}
-                color={colors.violet[900]}
-              />
-              <BarGroup
-                chartBounds={chartBounds}
-                betweenGroupPadding={0.2}
-                withinGroupPadding={0.1}
-              >
-                <BarGroup.Bar points={points.income} color={INCOME_COLOR} />
-                <BarGroup.Bar points={points.expense} color={EXPENSE_COLOR} />
-              </BarGroup>
-            </Fragment>
-          )}
+          {({ points, chartBounds }) => {
+            const w = chartBounds.right - chartBounds.left
+            const h = chartBounds.bottom - chartBounds.top
+            return (
+              <Fragment>
+                <Rect
+                  x={chartBounds.left}
+                  y={chartBounds.top}
+                  width={w}
+                  height={h}
+                >
+                  <LinearGradient
+                    start={vec(chartBounds.left, chartBounds.top)}
+                    end={vec(chartBounds.left, chartBounds.bottom)}
+                    colors={chartSurfaceColors}
+                  />
+                </Rect>
+                <BarGroup
+                  chartBounds={chartBounds}
+                  betweenGroupPadding={0.22}
+                  withinGroupPadding={0.12}
+                  roundedCorners={{
+                    topLeft: BAR_TOP_RADIUS,
+                    topRight: BAR_TOP_RADIUS,
+                  }}
+                >
+                  <BarGroup.Bar points={points.income} color={INCOME_COLOR} />
+                  <BarGroup.Bar points={points.expense} color={EXPENSE_COLOR} />
+                </BarGroup>
+              </Fragment>
+            )
+          }}
         </CartesianChart>
       </View>
 
@@ -174,30 +271,40 @@ const styles = StyleSheet.create({
   },
   legend: {
     flexDirection: 'row',
-    gap: 16,
-    marginBottom: 8,
-    paddingHorizontal: 4,
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 10,
+    paddingHorizontal: 2,
   },
-  legendItem: {
+  legendPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 9999,
+    backgroundColor: 'rgba(123, 92, 200, 0.12)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(186, 159, 216, 0.25)',
   },
-  legendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 2,
+  legendSwatch: {
+    width: 8,
+    height: 16,
+    borderRadius: 4,
   },
   legendText: {
     fontSize: 12,
-    fontFamily: 'DMSans_400Regular',
+    fontFamily: 'DMSans_500Medium',
     color: colors.violet[200],
+    letterSpacing: 0.2,
   },
   chartWrapper: {
     height: 280,
     backgroundColor: colors.violet[900],
-    borderRadius: 10,
+    borderRadius: 16,
     overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(186, 159, 216, 0.2)',
   },
   tooltipOverlay: {
     flex: 1,
