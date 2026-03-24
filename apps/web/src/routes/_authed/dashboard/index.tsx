@@ -85,11 +85,13 @@ function DashboardFilters({ initialUserIds }: { initialUserIds: string[] }) {
 	};
 
 	return (
-		<div className="mb-5 flex gap-4 items-end">
-			<div className="flex-1">
+		<div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:gap-4">
+			<div className="min-w-0 flex-1">
 				<UserFilter value={selectedUserIds} onChange={setSelectedUserIds} />
 			</div>
-			<Button onClick={handleApplyFilters}>Go</Button>
+			<Button className="w-full shrink-0 sm:w-auto" onClick={handleApplyFilters}>
+				Go
+			</Button>
 		</div>
 	);
 }
