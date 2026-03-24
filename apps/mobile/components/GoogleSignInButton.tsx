@@ -2,9 +2,9 @@ import { useSSO } from '@clerk/expo'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { ActivityIndicator, Alert, Platform, Pressable, Text } from 'react-native'
+import { colors } from '@money-saver/validations'
 
 interface GoogleSignInButtonProps {
-  /** Label for sign-in vs sign-up context */
   label?: 'Sign in with Google' | 'Sign up with Google'
   onSuccess?: () => void
 }
@@ -51,12 +51,12 @@ export function GoogleSignInButton({
     <Pressable
       onPress={handlePress}
       disabled={loading}
-      className={`rounded-lg border border-gray-300 bg-white px-6 py-3 active:opacity-80 ${loading ? 'opacity-70' : ''}`}
+      className={`rounded-pill border border-gray-200 bg-white px-6 py-3 active:opacity-90 ${loading ? 'opacity-70' : ''}`}
     >
       {loading ? (
-        <ActivityIndicator size="small" color="#374151" />
+        <ActivityIndicator size="small" color={colors.violet[600]} />
       ) : (
-        <Text className="text-center font-semibold text-gray-800">{label}</Text>
+        <Text className="text-center font-body-medium text-base text-gray-900">{label}</Text>
       )}
     </Pressable>
   )

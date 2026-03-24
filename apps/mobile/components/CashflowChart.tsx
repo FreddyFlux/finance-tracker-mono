@@ -1,19 +1,15 @@
-import { useCallback, useMemo, useState } from 'react'
-import { View, Text, Pressable, Modal, StyleSheet } from 'react-native'
-import { useAnimatedReaction, runOnJS } from 'react-native-reanimated'
-import {
-  CartesianChart,
-  BarGroup,
-  useChartPressState,
-} from 'victory-native'
-import { matchFont } from '@shopify/react-native-skia'
+import type { MonthlyCashflow } from '@money-saver/api-client'
+import { colors, CURRENCY_SYMBOL } from '@money-saver/validations'
 import { format } from 'date-fns'
 import numeral from 'numeral'
-import type { MonthlyCashflow } from '@money-saver/api-client'
-import { CURRENCY_SYMBOL } from '@money-saver/validations'
+import { Fragment, useCallback, useMemo, useState } from 'react'
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
+import { runOnJS, useAnimatedReaction } from 'react-native-reanimated'
+import { matchFont, Rect } from '@shopify/react-native-skia'
+import { BarGroup, CartesianChart, useChartPressState } from 'victory-native'
 
-const INCOME_COLOR = '#84cc16'
-const EXPENSE_COLOR = '#f97316'
+const INCOME_COLOR = colors.amber[500]
+const EXPENSE_COLOR = colors.pink[500]
 
 function formatCurrency(amount: number): string {
   return `${CURRENCY_SYMBOL}${numeral(amount).format('0,0')}`
@@ -31,16 +27,17 @@ export function CashflowChart({
   const font = useMemo(
     () =>
       matchFont({
-        fontFamily: 'System',
+        fontFamily: 'DMSans_400Regular',
         fontSize: 11,
         fontWeight: '400',
       }),
     [],
   )
 
-  const { state: pressState, isActive: isPressActive } = useChartPressState<
-    { x: number; y: { income: number; expense: number } }
-  >({
+  const { state: pressState } = useChartPressState<{
+    x: number
+    y: { income: number; expense: number }
+  }>({
     x: 1,
     y: { income: 0, expense: 0 },
   })
@@ -75,7 +72,7 @@ export function CashflowChart({
         format(new Date(year, Number(value) - 1, 1), 'MMM'),
       formatYLabel: (value: number) =>
         `${CURRENCY_SYMBOL}${numeral(value).format('0,0')}`,
-      labelColor: '#6b7280',
+      labelColor: colors.violet[300],
       axisSide: { x: 'bottom' as const, y: 'left' as const },
       labelPosition: { x: 'outset' as const, y: 'outset' as const },
     }),
@@ -89,7 +86,6 @@ export function CashflowChart({
 
   return (
     <View style={styles.container}>
-      {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: INCOME_COLOR }]} />
@@ -101,7 +97,6 @@ export function CashflowChart({
         </View>
       </View>
 
-      {/* Chart */}
       <View style={styles.chartWrapper}>
         <CartesianChart
           data={data}
@@ -116,19 +111,27 @@ export function CashflowChart({
           padding={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
           {({ points, chartBounds }) => (
-            <BarGroup
-              chartBounds={chartBounds}
-              betweenGroupPadding={0.2}
-              withinGroupPadding={0.1}
-            >
-              <BarGroup.Bar points={points.income} color={INCOME_COLOR} />
-              <BarGroup.Bar points={points.expense} color={EXPENSE_COLOR} />
-            </BarGroup>
+            <Fragment>
+              <Rect
+                x={chartBounds.left}
+                y={chartBounds.top}
+                width={chartBounds.right - chartBounds.left}
+                height={chartBounds.bottom - chartBounds.top}
+                color={colors.violet[900]}
+              />
+              <BarGroup
+                chartBounds={chartBounds}
+                betweenGroupPadding={0.2}
+                withinGroupPadding={0.1}
+              >
+                <BarGroup.Bar points={points.income} color={INCOME_COLOR} />
+                <BarGroup.Bar points={points.expense} color={EXPENSE_COLOR} />
+              </BarGroup>
+            </Fragment>
           )}
         </CartesianChart>
       </View>
 
-      {/* Press tooltip / popup */}
       <Modal visible={!!tooltipData} transparent animationType="fade">
         <View style={styles.tooltipOverlay}>
           <Pressable style={StyleSheet.absoluteFill} onPress={dismissTooltip} />
@@ -139,29 +142,20 @@ export function CashflowChart({
                 : ''}
             </Text>
             <View style={styles.tooltipRow}>
-              <Text style={[styles.tooltipLabel, { color: INCOME_COLOR }]}>
-                Income:
-              </Text>
+              <Text style={[styles.tooltipLabel, { color: INCOME_COLOR }]}>Income:</Text>
               <Text style={styles.tooltipValue}>
                 {tooltipData ? formatCurrency(tooltipData.income) : ''}
               </Text>
             </View>
             <View style={styles.tooltipRow}>
-              <Text style={[styles.tooltipLabel, { color: EXPENSE_COLOR }]}>
-                Expenses:
-              </Text>
+              <Text style={[styles.tooltipLabel, { color: EXPENSE_COLOR }]}>Expenses:</Text>
               <Text style={styles.tooltipValue}>
                 {tooltipData ? formatCurrency(tooltipData.expense) : ''}
               </Text>
             </View>
             {onMonthPress && (
-              <Pressable
-                style={styles.viewTransactionsButton}
-                onPress={handleViewTransactions}
-              >
-                <Text style={styles.viewTransactionsText}>
-                  View transactions
-                </Text>
+              <Pressable style={styles.viewTransactionsButton} onPress={handleViewTransactions}>
+                <Text style={styles.viewTransactionsText}>View transactions</Text>
               </Pressable>
             )}
             {!onMonthPress && (
@@ -196,33 +190,39 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: '#6b7280',
+    fontFamily: 'DMSans_400Regular',
+    color: colors.violet[200],
   },
   chartWrapper: {
     height: 280,
+    backgroundColor: colors.violet[900],
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   tooltipOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(26, 18, 53, 0.45)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
   tooltip: {
-    backgroundColor: 'white',
-    borderRadius: 12,
+    backgroundColor: colors.violet[900],
+    borderRadius: 16,
     padding: 16,
     minWidth: 200,
+    borderWidth: 0.5,
+    borderColor: colors.violet[700],
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 24,
     elevation: 8,
   },
   tooltipMonth: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontSize: 18,
+    fontFamily: 'CormorantGaramond_500Medium',
+    color: colors.violet[100],
     marginBottom: 12,
   },
   tooltipRow: {
@@ -233,16 +233,17 @@ const styles = StyleSheet.create({
   },
   tooltipLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: 'DMSans_500Medium',
   },
   tooltipValue: {
     fontSize: 14,
-    color: '#374151',
-    fontWeight: '600',
+    fontFamily: 'DMSans_500Medium',
+    color: colors.violet[100],
   },
   tooltipHint: {
     fontSize: 12,
-    color: '#9ca3af',
+    fontFamily: 'DMSans_400Regular',
+    color: colors.violet[400],
     marginTop: 12,
     textAlign: 'center',
   },
@@ -250,13 +251,13 @@ const styles = StyleSheet.create({
     marginTop: 12,
     paddingVertical: 10,
     paddingHorizontal: 16,
-    backgroundColor: '#84cc16',
-    borderRadius: 8,
+    backgroundColor: colors.violet[600],
+    borderRadius: 9999,
     alignItems: 'center',
   },
   viewTransactionsText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'white',
+    fontFamily: 'DMSans_500Medium',
+    color: '#FFFFFF',
   },
 })

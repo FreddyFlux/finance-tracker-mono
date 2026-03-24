@@ -84,17 +84,17 @@ export function UserFilter({ value, onChange }: UserFilterProps) {
 
   if (isLoading) {
     return (
-      <Text className="text-sm text-gray-500">Loading user filter...</Text>
+      <Text className="font-body text-sm text-violet-300">Loading user filter...</Text>
     )
   }
 
   if (connectionsError) {
     return (
-      <View className="flex-1">
-        <Text className="mb-2 text-sm font-medium text-gray-600">
-          Filter by User
+      <View className="w-full">
+        <Text className="mb-2 font-body-medium text-2xs uppercase tracking-wide text-violet-300">
+          Filter by user
         </Text>
-        <Text className="text-sm text-red-500">
+        <Text className="font-body text-sm text-danger">
           Failed to load filter: {connectionsError.message}
         </Text>
       </View>
@@ -106,26 +106,29 @@ export function UserFilter({ value, onChange }: UserFilterProps) {
   }
 
   return (
-    <View className="flex-1">
-      <Text className="mb-2 text-sm font-medium text-gray-600">
-        Filter by User
+    <View className="w-full">
+      <Text className="mb-2 font-body-medium text-2xs uppercase tracking-wide text-violet-300">
+        Filter by user
       </Text>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Pressable className="flex-row items-center justify-between rounded-lg border border-gray-300 bg-white px-4 py-3 active:opacity-80">
+          <Pressable className="flex-row items-center justify-between rounded-md border border-violet-600 bg-violet-800 px-4 py-3 active:opacity-90">
             <Text
-              className="flex-1 text-gray-800"
+              className="flex-1 font-body text-white"
               numberOfLines={1}
               ellipsizeMode="tail"
             >
               {selectedLabel}
             </Text>
-            <ChevronDown size={18} className="text-gray-500" />
+            <ChevronDown size={18} color="#B89FD8" />
           </Pressable>
         </DropdownMenuTrigger>
         <DropdownMenuPortal>
           <DropdownMenuOverlay style={StyleSheet.absoluteFill} closeOnPress />
-          <DropdownMenuContent className="min-w-[200px] rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+          <DropdownMenuContent
+            className="min-w-[200px] rounded-lg border border-violet-700 bg-violet-900 p-1 shadow-md"
+            sideOffset={8}
+          >
             {combinations.map((combo, index) => {
               const comboValue = JSON.stringify([...combo.userIds].sort())
               const isSelected =
@@ -140,7 +143,9 @@ export function UserFilter({ value, onChange }: UserFilterProps) {
                   closeOnPress
                 >
                   <Text
-                    className={isSelected ? 'font-semibold text-gray-900' : 'text-gray-800'}
+                    className={
+                      isSelected ? 'font-body-medium text-white' : 'font-body text-violet-200'
+                    }
                   >
                     {combo.label}
                   </Text>

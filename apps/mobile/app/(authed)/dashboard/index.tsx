@@ -1,12 +1,12 @@
-import { Link, useRouter } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
-import { Pressable, View, Text } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { useAnnualCashflow } from '@money-saver/api-client'
+import { CURRENCY_SYMBOL } from '@money-saver/validations'
 import { useAuth } from '@clerk/expo'
 import { useQuery } from '@tanstack/react-query'
-import { useAnnualCashflow } from '@money-saver/api-client'
+import { Link, useRouter } from 'expo-router'
 import numeral from 'numeral'
-import { CURRENCY_SYMBOL } from '@money-saver/validations'
+import { useCallback, useEffect, useState } from 'react'
+import { Pressable, Text, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { CashflowChart } from '../../../components/CashflowChart'
 import { UserFilter } from '../../../components/UserFilter'
 
@@ -52,64 +52,60 @@ export default function DashboardHome() {
   const balance = totalIncome - totalExpense
 
   return (
-    <SafeAreaView className="flex-1 bg-white" edges={['top']}>
+    <SafeAreaView className="flex-1 bg-violet-800" edges={['top']}>
       <View className="flex-1 p-6">
-        <Text className="mb-6 text-2xl font-bold text-gray-900">Dashboard</Text>
+        <Text className="mb-6 font-display-medium text-2xl text-white">Dashboard</Text>
 
-        <View className="mb-5 flex-row items-end gap-3">
-          <View className="flex-1">
-            <UserFilter
-              value={selectedUserIds}
-              onChange={setSelectedUserIds}
-            />
-          </View>
-        </View>
+        {/* Same pattern as chart → Transactions: one column, gap-6 between major blocks */}
+        <View className="gap-6">
+          <UserFilter value={selectedUserIds} onChange={setSelectedUserIds} />
 
-        {isLoading && (
-          <Text className="mb-4 text-gray-500">Loading cashflow...</Text>
-        )}
-        {error && (
-          <Text className="mb-4 text-red-500">
-            Failed to load cashflow: {error.message}
-          </Text>
-        )}
-        {cashflow && (
-          <View className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
-            <Text className="mb-2 text-sm text-gray-500">
-              Cashflow {currentYear}
+          {isLoading && (
+            <Text className="font-body text-sm text-violet-300">Loading cashflow...</Text>
+          )}
+          {error && (
+            <Text className="font-body text-sm text-danger">
+              Failed to load cashflow: {error.message}
             </Text>
-            <CashflowChart
-              data={cashflow}
-              year={currentYear}
-              onMonthPress={onMonthPress}
-            />
-            <View className="mt-4 border-t border-gray-100 pt-4">
-              <Text className="text-sm text-gray-500">
-                Income: {formatCurrency(totalIncome)}
+          )}
+          {cashflow && (
+            <View className="rounded-lg border border-violet-700 bg-violet-900 p-4 shadow-md">
+              <Text className="mb-2 font-body text-xs uppercase tracking-wide text-violet-300">
+                Cashflow {currentYear}
               </Text>
-              <Text className="text-sm text-gray-500">
-                Expenses: {formatCurrency(totalExpense)}
-              </Text>
-              <Text
-                className={`font-semibold ${balance >= 0 ? 'text-green-600' : 'text-orange-600'}`}
-              >
-                Balance: {formatCurrency(balance)}
-              </Text>
+              <CashflowChart
+                data={cashflow}
+                year={currentYear}
+                onMonthPress={onMonthPress}
+              />
+              <View className="mt-4 border-t border-violet-700 pt-4">
+                <Text className="font-body text-sm text-amber-400">
+                  Income: {formatCurrency(totalIncome)}
+                </Text>
+                <Text className="font-body text-sm text-pink-300">
+                  Expenses: {formatCurrency(totalExpense)}
+                </Text>
+                <Text
+                  className={`font-display text-md ${balance >= 0 ? 'text-amber-400' : 'text-pink-300'}`}
+                >
+                  Balance: {formatCurrency(balance)}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        <View className="gap-3">
-          <Link href="/(authed)/dashboard/transactions" asChild>
-            <Pressable className="rounded-lg border border-gray-200 bg-white px-4 py-3 active:opacity-80">
-              <Text className="font-medium text-gray-800">Transactions</Text>
-            </Pressable>
-          </Link>
-          <Link href="/(authed)/dashboard/connections" asChild>
-            <Pressable className="rounded-lg border border-gray-200 bg-white px-4 py-3 active:opacity-80">
-              <Text className="font-medium text-gray-800">Connections</Text>
-            </Pressable>
-          </Link>
+          <View className="gap-3">
+            <Link href="/(authed)/dashboard/transactions" asChild>
+              <Pressable className="rounded-lg border border-violet-700 bg-violet-900 px-4 py-3 shadow-md active:opacity-90">
+                <Text className="font-body-medium text-white">Transactions</Text>
+              </Pressable>
+            </Link>
+            <Link href="/(authed)/dashboard/connections" asChild>
+              <Pressable className="rounded-lg border border-violet-700 bg-violet-900 px-4 py-3 shadow-md active:opacity-90">
+                <Text className="font-body-medium text-white">Connections</Text>
+              </Pressable>
+            </Link>
+          </View>
         </View>
       </View>
     </SafeAreaView>

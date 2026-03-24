@@ -1,13 +1,9 @@
 import { Image, View } from 'react-native'
 
 export interface AvatarProps {
-  /** Image source URL (e.g. from Clerk user.imageUrl) */
   source?: string | null
-  /** Fallback when no image - renders initials or placeholder */
   fallback?: React.ReactNode
-  /** Size in pixels */
   size?: number
-  /** Additional class names */
   className?: string
 }
 
@@ -26,7 +22,7 @@ export function Avatar({
 
   if (source) {
     return (
-      <View style={containerStyle} className={className}>
+      <View style={containerStyle} className={`border-2 border-violet-700 ${className}`}>
         <Image
           source={{ uri: source }}
           style={{ width: size, height: size }}
@@ -39,7 +35,7 @@ export function Avatar({
   return (
     <View
       style={containerStyle}
-      className={`items-center justify-center bg-gray-300 ${className}`}
+      className={`items-center justify-center border-2 border-violet-700 bg-violet-100 ${className}`}
     >
       {fallback}
     </View>

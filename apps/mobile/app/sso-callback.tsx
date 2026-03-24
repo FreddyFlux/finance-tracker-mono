@@ -1,5 +1,6 @@
 import { ActivityIndicator, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { colors } from '@money-saver/validations'
 
 /**
  * OAuth callback route used by Clerk's startSSOFlow (Google sign-in).
@@ -10,9 +11,9 @@ import { SafeAreaView } from 'react-native-safe-area-context'
  */
 export default function SSOCallback() {
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-white">
-      <ActivityIndicator size="large" color="#65a30d" />
-      <Text className="mt-4 text-base text-gray-600">Signing in...</Text>
+    <SafeAreaView className="flex-1 items-center justify-center bg-violet-800">
+      <ActivityIndicator size="large" color={colors.amber[400]} />
+      <Text className="mt-4 font-body text-base text-violet-200">Signing in...</Text>
     </SafeAreaView>
   )
 }

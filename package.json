@@ -19,6 +19,13 @@
         "utf-8-validate": "5",
         "expo": "*"
       }
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@shopify/react-native-skia",
+      "browser-tabs-lock",
+      "bufferutil",
+      "core-js",
+      "utf-8-validate"
+    ]
   }
 }

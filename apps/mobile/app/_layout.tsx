@@ -1,16 +1,31 @@
 import { ClerkProvider, ClerkLoaded } from '@clerk/expo'
-import * as SecureStore from 'expo-secure-store'
+import {
+  CormorantGaramond_400Regular,
+  CormorantGaramond_400Regular_Italic,
+  CormorantGaramond_500Medium,
+  CormorantGaramond_600SemiBold,
+} from '@expo-google-fonts/cormorant-garamond'
+import {
+  DMSans_300Light,
+  DMSans_400Regular,
+  DMSans_500Medium,
+} from '@expo-google-fonts/dm-sans'
+import { useFonts } from 'expo-font'
 import { Slot } from 'expo-router'
-import { PortalHost } from '@rn-primitives/portal'
+import * as SecureStore from 'expo-secure-store'
+import * as SplashScreen from 'expo-splash-screen'
+import { StatusBar } from 'expo-status-bar'
+import { useEffect } from 'react'
 import { LogBox } from 'react-native'
+import { PortalHost } from '@rn-primitives/portal'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '../global.css'
 
-// Suppress SafeAreaView deprecation warning from React Native / dependencies.
-// Our app uses react-native-safe-area-context; the warning comes from RN core.
 LogBox.ignoreLogs(['SafeAreaView has been deprecated'])
+
+SplashScreen.preventAutoHideAsync()
 
 const queryClient = new QueryClient()
 
@@ -24,9 +39,30 @@ const tokenCache = {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    CormorantGaramond_400Regular,
+    CormorantGaramond_400Regular_Italic,
+    CormorantGaramond_500Medium,
+    CormorantGaramond_600SemiBold,
+    DMSans_300Light,
+    DMSans_400Regular,
+    DMSans_500Medium,
+  })
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync()
+    }
+  }, [fontsLoaded, fontError])
+
+  if (!fontsLoaded && !fontError) {
+    return null
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style="light" />
+      <GestureHandlerRootView className="bg-violet-800" style={{ flex: 1 }}>
         <SafeAreaProvider>
           <ClerkProvider
             tokenCache={tokenCache}
