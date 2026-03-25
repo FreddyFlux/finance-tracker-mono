@@ -12,7 +12,9 @@
   },
   "pnpm": {
     "overrides": {
-      "bs58": "^6.0.0"
+      "bs58": "^6.0.0",
+      "react": "19.2.0",
+      "react-dom": "19.2.0"
     },
     "peerDependencyRules": {
       "allowedVersions": {

@@ -1,5 +1,5 @@
 /* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -64,69 +64,69 @@ code {
 
   /* ── Fonts ── */
   --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body:    "DM Sans", system-ui, sans-serif;
-  --font-sans:    "DM Sans", system-ui, sans-serif;
-  --font-mono:    "JetBrains Mono", "Fira Code", monospace;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
 
   /* ── Violet (Primary) ── */
-  --color-violet-50:  #F7F3FE;
-  --color-violet-100: #EAE0FB;
-  --color-violet-200: #D4C4F0;
-  --color-violet-300: #B89FD8;
-  --color-violet-400: #9B7DE0;
-  --color-violet-500: #7B5CC8;
-  --color-violet-600: #5B3FA8;
-  --color-violet-700: #3D2B7A;
-  --color-violet-800: #2D1F5E;
-  --color-violet-900: #1A1235;
+  --color-violet-50: #f7f3fe;
+  --color-violet-100: #eae0fb;
+  --color-violet-200: #d4c4f0;
+  --color-violet-300: #b89fd8;
+  --color-violet-400: #9b7de0;
+  --color-violet-500: #7b5cc8;
+  --color-violet-600: #5b3fa8;
+  --color-violet-700: #3d2b7a;
+  --color-violet-800: #2d1f5e;
+  --color-violet-900: #1a1235;
 
   /* ── Amber (Accent) ── */
-  --color-amber-50:  #FFFBF0;
-  --color-amber-100: #FFF4DC;
-  --color-amber-200: #FFE8A8;
-  --color-amber-300: #FFD07A;
-  --color-amber-400: #FFBE4D;
-  --color-amber-500: #F5A623;
-  --color-amber-600: #D48B0F;
-  --color-amber-700: #B8720A;
+  --color-amber-50: #fffbf0;
+  --color-amber-100: #fff4dc;
+  --color-amber-200: #ffe8a8;
+  --color-amber-300: #ffd07a;
+  --color-amber-400: #ffbe4d;
+  --color-amber-500: #f5a623;
+  --color-amber-600: #d48b0f;
+  --color-amber-700: #b8720a;
 
   /* ── Lilac (Support) ── */
-  --color-lilac-50:  #F4F0FF;
-  --color-lilac-100: #EDE5FF;
-  --color-lilac-200: #E6DEFF;
-  --color-lilac-400: #C9BAEF;
-  --color-lilac-600: #8B6BBF;
+  --color-lilac-50: #f4f0ff;
+  --color-lilac-100: #ede5ff;
+  --color-lilac-200: #e6deff;
+  --color-lilac-400: #c9baef;
+  --color-lilac-600: #8b6bbf;
 
   /* ── Pink (Support) ── */
-  --color-pink-100: #FCE8F5;
-  --color-pink-300: #EE9ECD;
-  --color-pink-500: #D966A8;
+  --color-pink-100: #fce8f5;
+  --color-pink-300: #ee9ecd;
+  --color-pink-500: #d966a8;
 
   /* ── Semantic ── */
-  --color-success:       #1D9E75;
-  --color-success-light: #E1F5EE;
-  --color-danger:        #D85A30;
-  --color-danger-light:  #FAECE7;
-  --color-warning:       #F5A623;
-  --color-warning-light: #FFF4DC;
-  --color-info:          #5B3FA8;
-  --color-info-light:    #EAE0FB;
+  --color-success: #1d9e75;
+  --color-success-light: #e1f5ee;
+  --color-danger: #d85a30;
+  --color-danger-light: #faece7;
+  --color-warning: #f5a623;
+  --color-warning-light: #fff4dc;
+  --color-info: #5b3fa8;
+  --color-info-light: #eae0fb;
 
   /* ── Neutrals (purple-tinted) ── */
-  --color-gray-50:  #FAFAF9;
-  --color-gray-100: #F0EDF8;
-  --color-gray-200: #DDD8EE;
-  --color-gray-300: #C4BEDD;
-  --color-gray-400: #8A849A;
-  --color-gray-600: #5A5468;
-  --color-gray-900: #1A1630;
+  --color-gray-50: #fafaf9;
+  --color-gray-100: #f0edf8;
+  --color-gray-200: #ddd8ee;
+  --color-gray-300: #c4bedd;
+  --color-gray-400: #8a849a;
+  --color-gray-600: #5a5468;
+  --color-gray-900: #1a1630;
 
   /* ── Design system radius overrides ── */
   /* NOTE: these override the shadcn calc() aliases above intentionally */
-  --ds-radius-sm:   6px;
-  --ds-radius-md:   10px;
-  --ds-radius-lg:   16px;
-  --ds-radius-xl:   24px;
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 16px;
+  --ds-radius-xl: 24px;
   --ds-radius-pill: 9999px;
 
   /* ── Shadows ── */
@@ -213,7 +213,12 @@ code {
   body {
     @apply bg-violet-800 text-white;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     font-weight: 500;
     line-height: 1.15;
@@ -226,8 +231,12 @@ code {
    ============================================================================= */
 @layer utilities {
   /* Typography */
-  .font-display   { font-family: var(--font-display); }
-  .font-body      { font-family: var(--font-body); }
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-body {
+    font-family: var(--font-body);
+  }
 
   .text-display {
     font-family: var(--font-display);
@@ -262,8 +271,12 @@ code {
   }
 
   /* Amount colours */
-  .amount-negative { color: var(--color-violet-700); }
-  .amount-positive { color: var(--color-success); }
+  .amount-negative {
+    color: var(--color-violet-700);
+  }
+  .amount-positive {
+    color: var(--color-success);
+  }
 
   /* Card variants */
   .card-dark {
@@ -298,7 +311,9 @@ code {
     font-weight: 500;
     border: none;
     cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
+    transition:
+      background 0.15s,
+      transform 0.15s;
     box-shadow: 0 2px 12px rgba(91, 63, 168, 0.32);
     text-decoration: none;
   }
@@ -318,7 +333,9 @@ code {
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
+    transition:
+      background 0.15s,
+      transform 0.15s;
     box-shadow: 0 2px 12px rgba(245, 166, 35, 0.32);
     text-decoration: none;
   }
@@ -328,11 +345,26 @@ code {
   }
 
   /* Badge variants */
-  .badge-violet  { background: var(--color-violet-100); color: var(--color-violet-700); }
-  .badge-amber   { background: var(--color-amber-100);  color: var(--color-amber-700);  }
-  .badge-success { background: var(--color-success-light); color: #0F6E56; }
-  .badge-danger  { background: var(--color-danger-light);  color: #993C1D; }
-  .badge-pink    { background: var(--color-pink-100);   color: #8B3570;  }
+  .badge-violet {
+    background: var(--color-violet-100);
+    color: var(--color-violet-700);
+  }
+  .badge-amber {
+    background: var(--color-amber-100);
+    color: var(--color-amber-700);
+  }
+  .badge-success {
+    background: var(--color-success-light);
+    color: #0f6e56;
+  }
+  .badge-danger {
+    background: var(--color-danger-light);
+    color: #993c1d;
+  }
+  .badge-pink {
+    background: var(--color-pink-100);
+    color: #8b3570;
+  }
 
   /* Progress bar */
   .progress-track {
