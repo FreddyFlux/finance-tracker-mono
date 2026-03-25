@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router'
 import { LogOut } from 'lucide-react-native'
 import { Pressable, Text, View } from 'react-native'
 import { colors } from '@money-saver/validations'
-import { Avatar } from './ui/Avatar'
+import { Avatar, AvatarFallback, AvatarImage } from './ui/Avatar'
 import { Popover } from './ui/Popover'
 
 export function UserMenuButton() {
@@ -25,12 +25,21 @@ export function UserMenuButton() {
     <Popover
       trigger={
         <Avatar
-          source={user?.imageUrl ?? null}
-          fallback={
-            <Text className="font-body-medium text-xs text-violet-700">{initials}</Text>
+          alt={
+            user?.firstName && user?.lastName
+              ? `${user.firstName} ${user.lastName} avatar`
+              : 'User avatar'
           }
-          size={32}
-        />
+        >
+          {user?.imageUrl ? (
+            <AvatarImage source={{ uri: user.imageUrl }} />
+          ) : null}
+          <AvatarFallback>
+            <Text className="font-body-medium text-xs text-muted-foreground">
+              {initials}
+            </Text>
+          </AvatarFallback>
+        </Avatar>
       }
     >
       <View className="gap-1">

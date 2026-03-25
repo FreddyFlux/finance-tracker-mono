@@ -6,7 +6,7 @@ import { Link, useRouter } from 'expo-router'
 import { format } from 'date-fns'
 import numeral from 'numeral'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Pressable, Text, View } from 'react-native'
+import { Pressable, ScrollView, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CashflowChart, type CashflowChartPoint } from '../../../components/CashflowChart'
 import { TransactionRow } from '../../../components/TransactionRow'
@@ -125,7 +125,12 @@ export default function DashboardHome() {
 
   return (
     <SafeAreaView className="flex-1 bg-violet-800" edges={['top']}>
-      <View className="flex-1 p-6">
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="p-6 pb-10"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator
+      >
         <Text className="mb-6 font-display-medium text-2xl text-white">Dashboard</Text>
 
         {/* Same pattern as chart -> Transactions: one column, gap-6 between major blocks */}
@@ -219,7 +224,7 @@ export default function DashboardHome() {
             </Link>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   )
 }
