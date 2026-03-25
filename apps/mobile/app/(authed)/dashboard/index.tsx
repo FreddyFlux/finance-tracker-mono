@@ -3,11 +3,12 @@ import { CURRENCY_SYMBOL } from '@money-saver/validations'
 import { useAuth } from '@clerk/expo'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useRouter } from 'expo-router'
+import { format } from 'date-fns'
 import numeral from 'numeral'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { CashflowChart } from '../../../components/CashflowChart'
+import { CashflowChart, type CashflowChartPoint } from '../../../components/CashflowChart'
 import { UserFilter } from '../../../components/UserFilter'
 
 function formatCurrency(amount: number): string {
@@ -32,23 +33,74 @@ export default function DashboardHome() {
   }, [userId])
 
   const currentYear = new Date().getFullYear()
+
+  /** First month of the rolling 6-month window (may be in the previous calendar year). */
+  const needsPrevYearCashflow = useMemo(() => {
+    const now = new Date()
+    const windowStart = new Date(now.getFullYear(), now.getMonth() - 5, 1)
+    return windowStart.getFullYear() < now.getFullYear()
+  }, [])
+
   const onMonthPress = useCallback(
-    (month: number) => {
+    (month: number, year: number) => {
       router.push({
         pathname: '/(authed)/dashboard/transactions',
-        params: { month: String(month), year: String(currentYear) },
+        params: { month: String(month), year: String(year) },
       })
     },
-    [router, currentYear],
-  )
-  const { data: cashflow, isLoading, error } = useAnnualCashflow(
-    currentYear,
-    token ?? null,
-    selectedUserIds,
+    [router],
   )
 
-  const totalIncome = cashflow?.reduce((sum, m) => sum + m.income, 0) ?? 0
-  const totalExpense = cashflow?.reduce((sum, m) => sum + m.expense, 0) ?? 0
+  const { data: cashflowThisYear, isLoading: loadingThisYear, error: errorThisYear } =
+    useAnnualCashflow(currentYear, token ?? null, selectedUserIds)
+
+  const { data: cashflowPrevYear, isLoading: loadingPrevYear, error: errorPrevYear } =
+    useAnnualCashflow(currentYear - 1, token ?? null, selectedUserIds, {
+      enabled: needsPrevYearCashflow,
+    })
+
+  const isLoading = loadingThisYear || (needsPrevYearCashflow && loadingPrevYear)
+  const error = errorThisYear ?? errorPrevYear
+
+  const chartCashflow = useMemo((): CashflowChartPoint[] | undefined => {
+    if (!cashflowThisYear) return undefined
+    if (needsPrevYearCashflow && !cashflowPrevYear) return undefined
+
+    const get = (year: number, month: number) => {
+      const arr = year === currentYear ? cashflowThisYear : cashflowPrevYear
+      if (!arr) return { income: 0, expense: 0 }
+      const row = arr.find((m) => m.month === month)
+      return { income: row?.income ?? 0, expense: row?.expense ?? 0 }
+    }
+
+    const out: CashflowChartPoint[] = []
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(1)
+      d.setMonth(d.getMonth() - i)
+      const y = d.getFullYear()
+      const m = d.getMonth() + 1
+      const vals = get(y, m)
+      out.push({ year: y, month: m, ...vals })
+    }
+    return out
+  }, [cashflowThisYear, cashflowPrevYear, needsPrevYearCashflow, currentYear])
+
+  const cashflowPeriodLabel = useMemo(() => {
+    if (!chartCashflow?.length) return String(currentYear)
+    const start = chartCashflow[0]!
+    const end = chartCashflow[chartCashflow.length - 1]!
+    if (start.year === end.year && start.month === end.month) {
+      return format(new Date(start.year, start.month - 1, 1), 'MMMM yyyy')
+    }
+    if (start.year === end.year) {
+      return `${format(new Date(start.year, start.month - 1, 1), 'MMM')}–${format(new Date(end.year, end.month - 1, 1), 'MMM')} ${start.year}`
+    }
+    return `${format(new Date(start.year, start.month - 1, 1), 'MMM yyyy')}–${format(new Date(end.year, end.month - 1, 1), 'MMM yyyy')}`
+  }, [chartCashflow, currentYear])
+
+  const totalIncome = chartCashflow?.reduce((sum, m) => sum + m.income, 0) ?? 0
+  const totalExpense = chartCashflow?.reduce((sum, m) => sum + m.expense, 0) ?? 0
   const balance = totalIncome - totalExpense
 
   return (
@@ -68,16 +120,12 @@ export default function DashboardHome() {
               Failed to load cashflow: {error.message}
             </Text>
           )}
-          {cashflow && (
+          {cashflowThisYear && chartCashflow && (
             <View className="rounded-lg border border-violet-700 bg-violet-900 p-4 shadow-md">
               <Text className="mb-2 font-body text-xs uppercase tracking-wide text-violet-300">
-                Cashflow {currentYear}
+                Cashflow · {cashflowPeriodLabel}
               </Text>
-              <CashflowChart
-                data={cashflow}
-                year={currentYear}
-                onMonthPress={onMonthPress}
-              />
+              <CashflowChart data={chartCashflow} onMonthPress={onMonthPress} />
               <View className="mt-4 border-t border-violet-700 pt-4">
                 <Text className="font-body text-sm text-amber-400">
                   Income: {formatCurrency(totalIncome)}

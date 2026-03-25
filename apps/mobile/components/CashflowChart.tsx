@@ -34,14 +34,17 @@ function formatCurrency(amount: number): string {
   return `${CURRENCY_SYMBOL}${numeral(amount).format('0,0')}`
 }
 
+/** Month + calendar year for each bar (rolling windows can span two years). */
+export type CashflowChartPoint = MonthlyCashflow & { year: number }
+
+type ChartRow = CashflowChartPoint & { slot: number }
+
 export function CashflowChart({
   data,
-  year,
   onMonthPress,
 }: {
-  data: MonthlyCashflow[]
-  year: number
-  onMonthPress?: (month: number) => void
+  data: CashflowChartPoint[]
+  onMonthPress?: (month: number, year: number) => void
 }) {
   /**
    * Skia cannot use `matchFont` with Expo font family names — it needs the bundled TTF via `useFont`.
@@ -97,15 +100,20 @@ export function CashflowChart({
     [],
   )
 
+  const chartRows = useMemo<ChartRow[]>(
+    () => data.map((d, slot) => ({ ...d, slot })),
+    [data],
+  )
+
   const { state: pressState } = useChartPressState<{
     x: number
     y: { income: number; expense: number }
   }>({
-    x: 1,
+    x: 0,
     y: { income: 0, expense: 0 },
   })
 
-  const [tooltipData, setTooltipData] = useState<MonthlyCashflow | null>(null)
+  const [tooltipData, setTooltipData] = useState<CashflowChartPoint | null>(null)
 
   useAnimatedReaction(
     () => pressState.isActive.value,
@@ -122,17 +130,23 @@ export function CashflowChart({
 
   const handleViewTransactions = useCallback(() => {
     if (tooltipData && onMonthPress) {
-      onMonthPress(tooltipData.month)
+      onMonthPress(tooltipData.month, tooltipData.year)
     }
     setTooltipData(null)
   }, [tooltipData, onMonthPress])
 
+  const xTickCount = Math.max(1, Math.min(6, data.length || 1))
+
   const axisOptions = useMemo(
     () => ({
       font: axisFont ?? undefined,
-      tickCount: { x: 12, y: 5 },
-      formatXLabel: (value: number) =>
-        format(new Date(year, Number(value) - 1, 1), 'MMM'),
+      tickCount: { x: xTickCount, y: 5 },
+      formatXLabel: (value: number) => {
+        const idx = Math.min(data.length - 1, Math.max(0, Math.round(Number(value))))
+        const point = data[idx]
+        if (!point) return ''
+        return format(new Date(point.year, point.month - 1, 1), 'MMM')
+      },
       formatYLabel: (value: number) =>
         `${CURRENCY_SYMBOL}${numeral(value).format('0,0')}`,
       labelColor: { x: colors.violet[200], y: colors.violet[300] },
@@ -151,7 +165,7 @@ export function CashflowChart({
       labelPosition: { x: 'outset' as const, y: 'outset' as const },
       labelOffset: { x: 0, y: 6 },
     }),
-    [axisFont, year],
+    [axisFont, data, xTickCount],
   )
 
   const domainPadding = useMemo(
@@ -164,7 +178,13 @@ export function CashflowChart({
     [],
   )
 
-  const xDomain = useMemo(() => ({ x: [1, 12] as [number, number] }), [])
+  const xDomain = useMemo(() => {
+    if (data.length === 0) {
+      return { x: [0, 0] as [number, number] }
+    }
+    const last = data.length - 1
+    return { x: [0, last] as [number, number] }
+  }, [data.length])
 
   return (
     <View style={styles.container}>
@@ -181,8 +201,8 @@ export function CashflowChart({
 
       <View style={styles.chartWrapper}>
         <CartesianChart
-          data={data}
-          xKey="month"
+          data={chartRows}
+          xKey="slot"
           yKeys={['income', 'expense']}
           axisOptions={axisOptions}
           domain={xDomain}
@@ -235,7 +255,10 @@ export function CashflowChart({
           <View style={styles.tooltip}>
             <Text style={styles.tooltipMonth}>
               {tooltipData
-                ? format(new Date(year, tooltipData.month - 1, 1), 'MMMM yyyy')
+                ? format(
+                    new Date(tooltipData.year, tooltipData.month - 1, 1),
+                    'MMMM yyyy',
+                  )
                 : ''}
             </Text>
             <View style={styles.tooltipRow}>

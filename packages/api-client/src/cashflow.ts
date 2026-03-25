@@ -15,6 +15,7 @@ export function useAnnualCashflow(
 	year: number,
 	token: string | null,
 	userIds?: string[],
+	options?: { enabled?: boolean },
 ) {
 	return useQuery({
 		queryKey: cashflowKeys.annual(year, userIds),
@@ -27,6 +28,6 @@ export function useAnnualCashflow(
 				token: token ?? undefined,
 			})
 		},
-		enabled: !!token,
+		enabled: !!token && (options?.enabled ?? true),
 	})
 }
