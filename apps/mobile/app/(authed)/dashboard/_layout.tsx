@@ -55,6 +55,13 @@ export default function DashboardLayout() {
         }}
       />
       <Tabs.Screen
+        name="transactions/[id]"
+        options={{
+          title: 'Transaction',
+          tabBarItemStyle: { display: 'none' },
+        }}
+      />
+      <Tabs.Screen
         name="connections/index"
         options={{
           title: 'Connections',

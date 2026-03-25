@@ -13,6 +13,11 @@ export type Transaction = {
 	recurringTransactionId: number | null
 }
 
+/** From `GET /api/transactions/:id` — includes category id for edit forms. */
+export type TransactionDetail = Transaction & {
+	categoryId: number
+}
+
 export type CreateTransactionInput = {
 	transactionType: 'income' | 'expense'
 	categoryId: number
@@ -34,6 +39,8 @@ export const transactionKeys = {
 	all: ['transactions'] as const,
 	byMonth: (year: number, month: number, userIds?: string[]) =>
 		[...transactionKeys.all, 'month', year, month, userIds] as const,
+	recent: (limit: number, userIds?: string[]) =>
+		[...transactionKeys.all, 'recent', limit, userIds] as const,
 	detail: (id: number) => [...transactionKeys.all, id] as const,
 	yearsRange: ['transactions', 'years-range'] as const,
 }
@@ -61,10 +68,39 @@ export function useTransactionsByMonth(
 	})
 }
 
+const DEFAULT_RECENT_LIMIT = 5
+
+export function useRecentTransactions(
+	token: string | null,
+	options?: {
+		limit?: number
+		userIds?: string[]
+	},
+) {
+	const limit = options?.limit ?? DEFAULT_RECENT_LIMIT
+	const userIds = options?.userIds
+	return useQuery({
+		queryKey: transactionKeys.recent(limit, userIds),
+		queryFn: () => {
+			// Use /api/transactions?recent=1 (not /api/transactions/recent) so deployments don’t route "recent" to /api/transactions/$id.
+			const params = new URLSearchParams({
+				recent: '1',
+				limit: String(limit),
+				...(userIds?.length ? { userIds: userIds.join(',') } : {}),
+			})
+			return apiRequest<Transaction[]>(`/api/transactions?${params}`, {
+				token: token ?? undefined,
+			})
+		},
+		enabled: !!token,
+	})
+}
+
 export function useTransaction(id: number, token: string | null) {
 	return useQuery({
 		queryKey: transactionKeys.detail(id),
-		queryFn: () => apiRequest<Transaction>(`/api/transactions/${id}`, { token: token ?? undefined }),
+		queryFn: () =>
+			apiRequest<TransactionDetail>(`/api/transactions/${id}`, { token: token ?? undefined }),
 		enabled: !!token && !!id,
 	})
 }

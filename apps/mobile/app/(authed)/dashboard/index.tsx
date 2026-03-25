@@ -1,4 +1,4 @@
-import { useAnnualCashflow } from '@money-saver/api-client'
+import { useAnnualCashflow, useRecentTransactions } from '@money-saver/api-client'
 import { CURRENCY_SYMBOL } from '@money-saver/validations'
 import { useAuth } from '@clerk/expo'
 import { useQuery } from '@tanstack/react-query'
@@ -9,6 +9,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CashflowChart, type CashflowChartPoint } from '../../../components/CashflowChart'
+import { TransactionRow } from '../../../components/TransactionRow'
 import { UserFilter } from '../../../components/UserFilter'
 
 function formatCurrency(amount: number): string {
@@ -45,10 +46,14 @@ export default function DashboardHome() {
     (month: number, year: number) => {
       router.push({
         pathname: '/(authed)/dashboard/transactions',
-        params: { month: String(month), year: String(year) },
+        params: {
+          month: String(month),
+          year: String(year),
+          ...(selectedUserIds?.length ? { userIds: selectedUserIds.join(',') } : {}),
+        },
       })
     },
-    [router],
+    [router, selectedUserIds],
   )
 
   const { data: cashflowThisYear, isLoading: loadingThisYear, error: errorThisYear } =
@@ -61,6 +66,21 @@ export default function DashboardHome() {
 
   const isLoading = loadingThisYear || (needsPrevYearCashflow && loadingPrevYear)
   const error = errorThisYear ?? errorPrevYear
+
+  const {
+    data: recentTransactions,
+    isLoading: loadingRecent,
+    error: errorRecent,
+  } = useRecentTransactions(token ?? null, { userIds: selectedUserIds })
+
+  const viewAllParams = useMemo(() => {
+    const now = new Date()
+    return {
+      month: String(now.getMonth() + 1),
+      year: String(now.getFullYear()),
+      ...(selectedUserIds?.length ? { userIds: selectedUserIds.join(',') } : {}),
+    }
+  }, [selectedUserIds])
 
   const chartCashflow = useMemo((): CashflowChartPoint[] | undefined => {
     if (!cashflowThisYear) return undefined
@@ -146,8 +166,48 @@ export default function DashboardHome() {
             </View>
           )}
 
+          <View className="rounded-lg border border-violet-700 bg-violet-900 p-4 shadow-md">
+            <View className="mb-3 flex-row items-center justify-between gap-2">
+              <Text className="font-display-medium text-lg text-white">Recent transactions</Text>
+              <Link href={{ pathname: '/(authed)/dashboard/transactions', params: viewAllParams }} asChild>
+                <Pressable className="rounded-md py-1 active:opacity-80">
+                  <Text className="font-body-medium text-amber-400">View all</Text>
+                </Pressable>
+              </Link>
+            </View>
+            {loadingRecent && (
+              <Text className="font-body text-sm text-violet-300">Loading…</Text>
+            )}
+            {errorRecent && (
+              <Text className="font-body text-sm text-danger">
+                {errorRecent.message}
+              </Text>
+            )}
+            {!loadingRecent &&
+              !errorRecent &&
+              recentTransactions &&
+              recentTransactions.length === 0 && (
+                <Text className="font-body text-sm text-violet-300">
+                  No transactions yet
+                </Text>
+              )}
+            {!loadingRecent &&
+              !errorRecent &&
+              recentTransactions?.map((t) => (
+                <TransactionRow
+                  key={t.id}
+                  transaction={t}
+                  variant="compact"
+                  onPress={() =>
+                    router.push(`/(authed)/dashboard/transactions/${t.id}`)
+                  }
+                  disabled={!userId || t.userId !== userId}
+                />
+              ))}
+          </View>
+
           <View className="gap-3">
-            <Link href="/(authed)/dashboard/transactions" asChild>
+            <Link href={{ pathname: '/(authed)/dashboard/transactions', params: viewAllParams }} asChild>
               <Pressable className="rounded-lg border border-violet-700 bg-violet-900 px-4 py-3 shadow-md active:opacity-90">
                 <Text className="font-body-medium text-white">Transactions</Text>
               </Pressable>

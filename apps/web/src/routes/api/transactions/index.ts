@@ -16,6 +16,14 @@ import {
 } from '@/lib/validation'
 import { generateRecurringTransactionsForMonth } from '@/data/generateRecurringTransactions'
 
+const userIdsQueryTransform = z
+	.string()
+	.optional()
+	.transform((val) => {
+		if (!val) return undefined
+		return val.split(',').filter(Boolean)
+	})
+
 const getTransactionsSchema = z.object({
 	month: z.coerce.number().min(1).max(12),
 	year: z
@@ -23,11 +31,77 @@ const getTransactionsSchema = z.object({
 		.number()
 		.min(getCurrentYear() - TRANSACTION_LIMITS.YEAR_RANGE_OFFSET)
 		.max(getCurrentYear()),
-	userIds: z.string().optional().transform((val) => {
-		if (!val) return undefined
-		return val.split(',').filter(Boolean)
-	}),
+	userIds: userIdsQueryTransform,
 })
+
+function parseRecentLimit(raw: string | null): number {
+	if (raw == null || raw === '') {
+		return TRANSACTION_LIMITS.RECENT_TRANSACTIONS
+	}
+	const n = Number(raw)
+	if (Number.isNaN(n)) {
+		return TRANSACTION_LIMITS.RECENT_TRANSACTIONS
+	}
+	return Math.min(50, Math.max(1, Math.floor(n)))
+}
+
+/** Query flag for dashboard “recent” list — avoid Zod here (Zod 4 + transforms can fail safeParse unexpectedly). */
+function parseUserIdsSearchParam(raw: string | null): string[] | undefined {
+	if (raw == null || raw.trim() === '') return undefined
+	const ids = raw.split(',').map((s) => s.trim()).filter(Boolean)
+	return ids.length > 0 ? ids : undefined
+}
+
+function getSearchParamCaseInsensitive(url: URL, key: string): string | null {
+	const want = key.toLowerCase()
+	for (const [name, value] of url.searchParams.entries()) {
+		if (name.toLowerCase() === want) {
+			return value
+		}
+	}
+	return null
+}
+
+function isRecentTransactionsRequest(url: URL): boolean {
+	const raw = getSearchParamCaseInsensitive(url, 'recent')
+	if (raw === null) return false
+	const v = raw
+	if (v === '0' || v === 'false') return false
+	// ?recent=1, ?recent=true, or ?recent / ?recent= (empty) — some clients omit the value
+	return v === '1' || v === 'true' || v === ''
+}
+
+async function resolveTargetUserIds(
+	viewerUserId: string,
+	validatedUserIds: string[] | undefined,
+): Promise<
+	{ ok: true; targetUserIds: string[] } | { ok: false; response: Response }
+> {
+	let targetUserIds: string[]
+
+	if (validatedUserIds && validatedUserIds.length > 0) {
+		for (const userIdParam of validatedUserIds) {
+			if (userIdParam === viewerUserId) {
+				continue
+			}
+			const hasPermission = await canViewUserTransactions(viewerUserId, userIdParam)
+			if (!hasPermission) {
+				return {
+					ok: false,
+					response: Response.json(
+						{ error: `Not authorized to view transactions for user: ${userIdParam}` },
+						{ status: 403 },
+					),
+				}
+			}
+		}
+		targetUserIds = validatedUserIds
+	} else {
+		targetUserIds = [viewerUserId]
+	}
+
+	return { ok: true, targetUserIds }
+}
 
 const createTransactionSchema = z.object({
 	transactionType: z.enum(['income', 'expense']),
@@ -48,6 +122,43 @@ export const Route = createFileRoute('/api/transactions/')({
 					}
 
 					const url = new URL(request.url)
+					const viewerUserId = userId
+
+					// Recent list (dashboard): use ?recent=1 so this is not mistaken for /api/transactions/$id ("recent").
+					if (isRecentTransactionsRequest(url)) {
+						const limit = parseRecentLimit(getSearchParamCaseInsensitive(url, 'limit'))
+						const parsedUserIds = parseUserIdsSearchParam(
+							getSearchParamCaseInsensitive(url, 'userIds'),
+						)
+						const resolved = await resolveTargetUserIds(viewerUserId, parsedUserIds)
+						if (!resolved.ok) {
+							return resolved.response
+						}
+						const { targetUserIds } = resolved
+
+						const recentRows = await db
+							.select({
+								id: transactionsTable.id,
+								userId: transactionsTable.userId,
+								description: transactionsTable.description,
+								amount: transactionsTable.amount,
+								transactionDate: transactionsTable.transactionDate,
+								category: categoriesTable.name,
+								transactionType: categoriesTable.type,
+								recurringTransactionId: transactionsTable.recurringTransactionId,
+							})
+							.from(transactionsTable)
+							.leftJoin(
+								categoriesTable,
+								eq(transactionsTable.categoryId, categoriesTable.id),
+							)
+							.where(inArray(transactionsTable.userId, targetUserIds))
+							.orderBy(desc(transactionsTable.transactionDate))
+							.limit(limit)
+
+						return Response.json(recentRows)
+					}
+
 					const params = {
 						month: url.searchParams.get('month'),
 						year: url.searchParams.get('year'),
@@ -55,34 +166,13 @@ export const Route = createFileRoute('/api/transactions/')({
 					}
 
 					const validated = getTransactionsSchema.parse(params)
-					const viewerUserId = userId
 					let targetUserIds: string[]
 
-					// Determine which users' transactions to fetch
-					if (validated.userIds && validated.userIds.length > 0) {
-						// Verify permission to view each user's transactions
-						for (const userIdParam of validated.userIds) {
-							// Allow viewing own transactions
-							if (userIdParam === viewerUserId) {
-								continue
-							}
-							// Verify permission for connected users
-							const hasPermission = await canViewUserTransactions(
-								viewerUserId,
-								userIdParam,
-							)
-							if (!hasPermission) {
-								return Response.json(
-									{ error: `Not authorized to view transactions for user: ${userIdParam}` },
-									{ status: 403 },
-								)
-							}
-						}
-						targetUserIds = validated.userIds
-					} else {
-						// Default: only own transactions
-						targetUserIds = [viewerUserId]
+					const resolved = await resolveTargetUserIds(viewerUserId, validated.userIds)
+					if (!resolved.ok) {
+						return resolved.response
 					}
+					targetUserIds = resolved.targetUserIds
 
 					// Generate recurring transactions for each user
 					for (const userIdParam of targetUserIds) {
